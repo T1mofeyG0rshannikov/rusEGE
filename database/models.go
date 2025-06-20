@@ -1,20 +1,19 @@
 package database
 
-
 type Task struct {
 	Id     uint `json:"id"`
 	Number uint `json:"number"`
 }
 
 type Word struct {
-	Id     uint `json:"id"`
-	TaskId uint `json:"task_id"`
+	Id     uint   `json:"id"`
+	TaskId uint   `json:"task_id"`
 	Rule   string `json:"rule"`
 }
 
 type User struct {
-	Id             uint `json:"id"`
-	Userame        string `json:"username"`
+	Id           uint   `json:"id"`
+	Username     string `json:"username" gorm:"unique"`
 	HashPassword string `json:"hash_password"`
 }
 
