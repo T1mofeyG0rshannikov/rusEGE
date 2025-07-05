@@ -6,31 +6,17 @@ import (
 	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
-	"rusEGE/interfaces"
 	"rusEGE/repositories"
 	"rusEGE/web/schemas"
 	"rusEGE/web/utils"
-
+	
 	"github.com/labstack/echo/v4"
-
-	"math/rand"
+	
 	"rusEGE/auth"
 	"rusEGE/usecases"
 	"strconv"
-	"time"
 )
 
-func shuffleSlice(slice []interfaces.Word) {
-	// Инициализируем генератор случайных чисел.
-	rand.Seed(time.Now().UnixNano())
-
-	// Реализация перемешивания Фишера-Йетса (Fisher-Yates shuffle).
-	n := len(slice)
-	for i := n - 1; i > 0; i-- {
-		j := rand.Intn(i + 1)
-		slice[i], slice[j] = slice[j], slice[i]
-	}
-}
 
 func CreateTaskHandler(c echo.Context) error {
 	var payload schemas.CreateTaskRequest
@@ -186,7 +172,6 @@ func GetWordsHandler(c echo.Context) error {
 		}
 	}
 
-	shuffleSlice(words)
 	data := map[string]interface{}{
 		"words": words,
 	}

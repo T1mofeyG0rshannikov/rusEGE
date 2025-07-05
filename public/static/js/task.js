@@ -11,6 +11,8 @@ function getErrorText(errorCount) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    getSeo()
+
     function updateProgressBar() {
         const percent = Math.max((index / maxSteps) * 100, progressBarPercent);
         progressBarPercent = percent;
@@ -38,9 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (words.length == 1){
                 document.querySelector(".word-wrapper").innerHTML = `
                     <p class="success">Отлично!</p>
-                    <p>Вы допустили ${errors} ${getErrorText(errors)}</p>
-                    <button class="button" onclick="window.location.reload()">Ещё раз</button>
-                    <button class="button" onclick="window.location.href='/'">На главную</button>
+                    <p style="font-size: 20px;">Вы допустили ${errors} ${getErrorText(errors)}</p>
+                    <div class="finish-buttons">
+                        <button class="button" onclick="window.location.reload()">Ещё раз</button>
+                        <button class="button" onclick="window.location.href='/'">На главную</button>
+                    </div>
                 `
                 return
             }
@@ -51,7 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let words = []
     function getWords(){
-        fetch("/api/words/get/9").then(response => {
+        const taskNum = window.location.href.split('/')[4]
+
+        fetch(`/api/words/get/${taskNum}`).then(response => {
             if (response.status == 200){
                 response.json().then(response => {
                     words = response.words

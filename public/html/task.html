@@ -2,10 +2,15 @@
 <body class="fix-body">
     <div class="navbar">
         <div class="navbar-left">
-            <a href="/" class="arrow-icon"><i class="fas fa-arrow-left"></i></a>
+            <div style="display: flex; align-items: center;">
+                <a href="/tasks" class="arrow-icon"><i class="fas fa-arrow-left"></i></a>
+
+                <a href="/"><img src="" alt="logo" id="logo"></a>
+            </div>
         </div>
         <div class="navbar-right">
-            <a href="/settings" class="settings-icon"><i class="fas fa-cog"></i></a>
+            <img src="/static/images/question.png" />
+            <img src="/static/images/gear.png" />
         </div>
     </div>
 
@@ -25,6 +30,7 @@
         </main>
 
     </div>
+    <script src="/static/js/seo.js" ></script>
     <script src="/static/js/task.js" ></script>
 </body>
 {{ end }}

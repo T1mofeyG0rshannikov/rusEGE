@@ -77,3 +77,7 @@ main{
     left: 50%;
     transform: translate(-50%, -50%);
 }
+.navbar .navbar-right img{
+    height: 30px;
+    margin: 10px;
+}

@@ -229,24 +229,7 @@
     </section>
 </body>
 
-<script>
-    function getSeo(){
-        fetch("/api/indexseo").then(response => {
-            if (response.status == 200){
-                response.json().then(response => {
-                    const seo = response.seo;
-                    console.log(response)
-                    console.log(seo)
-                    document.querySelector("#image").src = seo.image
-                    document.querySelector("#title").textContent = seo.title
-                    document.querySelector("#about").textContent = seo.about
-                    document.querySelector("#logo").src = seo.logo
-                })
-            }
-        })
-    }
-
-    getSeo()
-</script>
+<script src="/static/js/seo.js"></script>
+<script src="/static/js/index.js"></script>
 </html>
 {{ end }}

@@ -78,3 +78,20 @@ main{
     80% { transform: translateX(5px); }
     100% { transform: translateX(0); }
 }
+
+.navbar #logo{
+    width: 300px;
+}
+
+.finish-buttons{
+    display: flex;
+}
+
+.finish-buttons button{
+    width: 125px;
+}
+
+.finish-buttons button:first-child{
+    background-color: #bb74d6;
+    padding: 15px;
+}
