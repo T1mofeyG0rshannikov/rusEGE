@@ -1,0 +1,79 @@
+package repositories
+
+import (
+	"errors"
+	"rusEGE/database"
+	"rusEGE/database/utils"
+	"rusEGE/exceptions"
+	"rusEGE/web/schemas"
+
+	"gorm.io/gorm"
+)
+
+type TaskRepository interface {
+	Create(word *database.UserWord) error
+	GetAll() ([]*database.Word, error)
+	Get(number uint) (*database.Task, error)
+}
+
+type GormTaskRepository struct {
+	db *gorm.DB
+}
+
+func NewGormTaskRepository(db *gorm.DB) *GormTaskRepository {
+	return &GormTaskRepository{db}
+}
+
+func (r *GormTaskRepository) GetAll() ([]*database.Task, error) {
+	var tasks []*database.Task
+	result := r.db.Find(&tasks)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return tasks, nil
+}
+
+func (r *GormTaskRepository) Create(task *database.Task) (*database.Task, error) {
+	result := r.db.Create(task)
+	if result.Error != nil {
+		switch {
+		case utils.IsUniqueConstraintError(result.Error):
+			return nil, exceptions.ErrTaskAlreadyExists
+		default:
+			return nil, result.Error
+		}
+	}
+
+	return task, nil
+}
+
+func (r *GormTaskRepository) Edit(number uint, data schemas.EditTaskRequest) error {
+	task, err := r.Get(number)
+	if err != nil {
+		return err
+	}
+
+	task.Description = data.Description
+
+	// Сохраняем изменения в базе данных
+	result := r.db.Save(&task)
+	if result.Error != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *GormTaskRepository) Get(number uint) (*database.Task, error) {
+	var task database.Task
+	result := r.db.Where("Number = ?", number).First(&task)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, exceptions.ErrTaskNotFound
+		} else {
+			return nil, result.Error
+		}
+	}
+	return &task, nil
+}

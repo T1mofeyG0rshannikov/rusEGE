@@ -1,0 +1,80 @@
+#options{
+    display: flex;
+}
+.option{
+    font-size: 20px;
+    background: rgb(220, 220, 220);
+    display: block;
+    box-sizing: border-box;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .1s;
+}
+.option:hover{
+    opacity: .7;
+}
+#rule{
+    color: rgb(150, 150, 150);
+}
+.correct{
+    color:white;
+    background: rgb(100, 255, 100)
+}
+.wrong{
+    color: white;
+    background: rgb(255, 100, 100)
+}
+main{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.word-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+#word{
+    font-size: 100px;
+}
+.progressbar {
+    height: 9px;
+    margin-right: 25px;
+    margin-bottom: 14px;
+    border-radius: 90px;
+    position: relative;
+    background: #e8e8e8;
+    width: 500px;
+    height: 17px;
+}
+.progressbar__value {
+    position: absolute;
+    width: 0%;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: all 0.3s;
+    background: rgb(80, 200, 80);
+    border-radius: 10px;
+}
+.success{
+    font-size: 70px;
+    margin-bottom: 15px;
+}
+.shake {
+    animation: shake .5s;
+    animation-iteration-count: infinite; /* Или любое другое нужное количество */
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}

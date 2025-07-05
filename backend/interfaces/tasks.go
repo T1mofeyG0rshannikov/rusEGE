@@ -1,0 +1,47 @@
+package interfaces
+
+type Word struct {
+	Word string `json:"word"`
+	Rule *string `json:"rule"`
+
+	Options []Option
+}
+
+type Option struct {
+	Letter string `json:"letter"`
+	Correct bool `json:"correct"`
+}
+
+var LETTEROPTIONS = map[rune][]Option{
+	'О': {
+		Option{Letter: "А", Correct: false}, 
+		Option{Letter: "О", Correct: true},
+	},
+	'А': {
+		Option{Letter: "А", Correct: true}, 
+		Option{Letter: "О", Correct: false},
+	},
+	'И': {
+		Option{Letter: "И", Correct: true}, 
+		Option{Letter: "Е", Correct: false}, 
+	},
+	'Е': {
+		Option{Letter: "И", Correct: false}, 
+		Option{Letter: "Е", Correct: true}, 
+	},
+	'Ь': {
+		Option{Letter: "Ь", Correct: true},
+		Option{Letter: "Ъ", Correct: false},
+		Option{Letter: "-", Correct: false},
+	},
+	'Ъ': {
+		Option{Letter: "Ь", Correct: false},
+		Option{Letter: "Ъ", Correct: true},
+		Option{Letter: "-", Correct: false},
+	},
+	'?': {
+		Option{Letter: "Ь", Correct: false},
+		Option{Letter: "Ъ", Correct: false},
+		Option{Letter: "-", Correct: true},
+	},
+}

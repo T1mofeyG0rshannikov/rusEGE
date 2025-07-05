@@ -1,0 +1,79 @@
+/* Общие стили */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Стили навбара */
+.navbar {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.arrow-icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.settings-icon {
+    font-size: 20px;
+}
+
+/* Стили контента */
+.content {
+    padding: 20px;
+    height: calc(100vh - 50px);
+}
+.button{
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: rgb(80, 200, 80);
+    color: white;
+    font-size: 17px;
+    width: 250px;
+    cursor: pointer;
+}
+.button a{
+    color: white;
+    text-decoration: none;
+}
+.button:hover{
+    opacity: .7;
+}
+.fix-body{
+    height: 100vh;
+    overflow: hidden;
+}
+main{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -1,0 +1,31 @@
+{{ define "task" }}
+<body class="fix-body">
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="/" class="arrow-icon"><i class="fas fa-arrow-left"></i></a>
+        </div>
+        <div class="navbar-right">
+            <a href="/settings" class="settings-icon"><i class="fas fa-cog"></i></a>
+        </div>
+    </div>
+
+    <div class="content">
+        <main>
+            <div class="word-wrapper">
+                <div class="progressbar">
+                    <div class="progressbar__value"></div>
+                </div>
+                
+                <h1 id="word"></h1>
+                <span id="rule"></span>
+                <div id="options">
+                    
+                </div>
+            </div>
+        </main>
+
+    </div>
+    <script src="/static/js/task.js" ></script>
+</body>
+</html>
+{{ end }}
