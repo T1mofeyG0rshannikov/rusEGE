@@ -1,7 +1,7 @@
 package mappers
 
 import (
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/interfaces"
 	"strings"
 	"unicode"
@@ -29,7 +29,7 @@ func WordOptions(word string) []interfaces.Option {
 	return []interfaces.Option{}
 }
 
-func DbUserWordToWord(dbWords []*database.UserWord) []interfaces.Word {
+func DbUserWordToWord(dbWords []*models.UserWord) []interfaces.Word {
 	words := make([]interfaces.Word, len(dbWords))
 
 	for i, dbWord := range dbWords {
@@ -43,7 +43,7 @@ func DbUserWordToWord(dbWords []*database.UserWord) []interfaces.Word {
 	return words
 }
 
-func DbWordToWord(dbWords []*database.Word) []interfaces.Word {
+func DbWordToWord(dbWords []*models.Word) []interfaces.Word {
 	words := make([]interfaces.Word, len(dbWords))
 
 	for i, dbWord := range dbWords {

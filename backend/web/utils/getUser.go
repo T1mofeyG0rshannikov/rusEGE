@@ -2,9 +2,10 @@ package utils
 
 import (
 	"rusEGE/auth"
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,10 +13,10 @@ func GetUserFromHeader(
 	jwtProcessor *auth.JWTProcessor,
 	ur *repositories.GormUserRepository,
 	c echo.Context,
-) (*database.User, error) {
+) (*models.User, error) {
 	authHeader := c.Request().Header.Get("Authorization")
-	
-	if authHeader == ""{
+
+	if authHeader == "" {
 		return nil, exceptions.ErrNoAuthHeader
 	}
 

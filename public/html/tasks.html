@@ -1,8 +1,23 @@
 {{ define "tasks" }}
 
-<h1>Тренажёр по орфографии для егэ по русскому языку</h1>
+<body class="fix-body">
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="/" class="arrow-icon"><i class="fas fa-arrow-left"></i></a>
+        </div>
+        <div class="navbar-right">
+            <a href="/settings" class="settings-icon"><i class="fas fa-cog"></i></a>
+        </div>
+    </div>
 
-<ul></ul>
+    <div class="content">
+        <main style="width: 90%;">
+            <h1>Тренажёр по орфографии для егэ по русскому языку</h1>
+            <ul></ul>
+        </main>
 
-<script src="/static/js/tasks.js"></script>
+    </div>
+    <script src="/static/js/tasks.js" ></script>
+</body>
+
 {{ end }}

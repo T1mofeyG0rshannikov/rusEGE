@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"rusEGE/auth"
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
 	"rusEGE/security"
@@ -27,7 +27,7 @@ func CreateUser(
 		return nil, err
 	}
 
-	userDB, err := ur.Create(&database.User{
+	userDB, err := ur.Create(&models.User{
 		Username:     data.Username,
 		HashPassword: hashedPassword,
 	})
@@ -43,7 +43,7 @@ func CreateUser(
 	}
 
 	for _, word := range words {
-		wr.CreateUserWord(&database.UserWord{
+		wr.CreateUserWord(&models.UserWord{
 			UserId: userDB.Id,
 			Word: word.Word,
 			TaskId: word.TaskId,

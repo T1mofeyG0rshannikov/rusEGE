@@ -2,15 +2,15 @@ package repositories
 
 import (
 	"errors"
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/exceptions"
 
 	"gorm.io/gorm"
 )
 
 type UserRepository interface {
-	Create(user *database.User) (*database.User, error)
-	Get(username *string) (*database.User, error)
+	Create(user *models.User) (*models.User, error)
+	Get(username *string) (*models.User, error)
 }
 
 type GormUserRepository struct {
@@ -21,7 +21,7 @@ func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
 	return &GormUserRepository{db}
 }
 
-func (r *GormUserRepository) Create(user *database.User) (*database.User, error) {
+func (r *GormUserRepository) Create(user *models.User) (*models.User, error) {
 	result := r.db.Create(user)
 	if result.Error != nil {
 		return nil, result.Error
@@ -30,8 +30,8 @@ func (r *GormUserRepository) Create(user *database.User) (*database.User, error)
 	return user, nil
 }
 
-func (r *GormUserRepository) Get(username string) (*database.User, error) {
-	var user database.User
+func (r *GormUserRepository) Get(username string) (*models.User, error) {
+	var user models.User
 	result := r.db.Where("Username = ?", username).First(&user)
 
 	if result.Error != nil {

@@ -1,14 +1,14 @@
 package repositories
 
 import (
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"gorm.io/gorm"
 )
 
 
 type WordRepository interface {
-	CreateUserWord(word *database.UserWord) error
-	GetAll() ([] *database.Word, error)
+	CreateUserWord(word *models.UserWord) error
+	GetAll() ([] *models.Word, error)
 }
 
 type GormWordRepository struct {
@@ -19,7 +19,7 @@ func NewGormWordRepository(db *gorm.DB) *GormWordRepository {
 	return &GormWordRepository{db: db}
 }
 
-func (r *GormWordRepository) CreateUserWord(word *database.UserWord) (*database.UserWord, error) {
+func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.UserWord, error) {
 	result := r.db.Create(word)
 	if result.Error != nil{
 		return nil, result.Error
@@ -28,7 +28,7 @@ func (r *GormWordRepository) CreateUserWord(word *database.UserWord) (*database.
 	return word, nil
 }
 
-func (r *GormWordRepository) Create(word *database.Word) (*database.Word, error) {
+func (r *GormWordRepository) Create(word *models.Word) (*models.Word, error) {
 	result := r.db.Create(word)
 	if result.Error != nil{
 		return nil, result.Error
@@ -37,8 +37,8 @@ func (r *GormWordRepository) Create(word *database.Word) (*database.Word, error)
 	return word, nil
 }
 
-func (r *GormWordRepository) GetAll() ([] *database.Word, error) {
-	var words []*database.Word
+func (r *GormWordRepository) GetAll() ([] *models.Word, error) {
+	var words []*models.Word
 	result := r.db.Find(&words)
 	if result.Error != nil {
 		return nil, result.Error
@@ -48,8 +48,8 @@ func (r *GormWordRepository) GetAll() ([] *database.Word, error) {
 }
 
 
-func (r *GormWordRepository) GetTaskWords(taskId uint) ([] *database.Word, error) {
-	var words []*database.Word
+func (r *GormWordRepository) GetTaskWords(taskId uint) ([] *models.Word, error) {
+	var words []*models.Word
 	result := r.db.Where("task_id = ?", taskId).Find(&words)
 	if result.Error != nil {
 		return nil, result.Error
@@ -59,8 +59,8 @@ func (r *GormWordRepository) GetTaskWords(taskId uint) ([] *database.Word, error
 }
 
 
-func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint) ([] *database.UserWord, error) {
-	var words []*database.UserWord
+func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint) ([] *models.UserWord, error) {
+	var words []*models.UserWord
 	result := r.db.Where("TaskId = ? UserId = ?", taskId, userId).Find(&words)
 	if result.Error != nil {
 		return nil, result.Error

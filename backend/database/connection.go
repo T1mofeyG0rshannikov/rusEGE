@@ -1,6 +1,7 @@
 package database
 
 import (
+	"rusEGE/database/models"
 	"fmt"
 	"log"
 	"os"
@@ -27,7 +28,7 @@ func Init() *gorm.DB {
 		log.Fatal(err)
 	}
 
-	db.AutoMigrate(&Task{}, &Word{}, &User{}, &UserWord{})
+	db.AutoMigrate(&models.Task{}, &models.Word{}, &models.User{}, &models.UserWord{}, &models.IndexSeo{})
 	return db
 }
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
@@ -41,7 +42,7 @@ func CreateTaskHandler(c echo.Context) error {
 	db := database.GetDB()
 	tr := repositories.NewGormTaskRepository(db)
 
-	task, err := tr.Create(&database.Task{
+	task, err := tr.Create(&models.Task{
 		Number: payload.Number,
 	})
 
@@ -131,7 +132,7 @@ func CreateWordHandler(c echo.Context) error {
 		}
 	}
 
-	word, err := wr.Create(&database.Word{
+	word, err := wr.Create(&models.Word{
 		TaskId: task.Id,
 		Word:   payload.Word,
 		Rule:   payload.Rule,
@@ -167,8 +168,10 @@ func GetWordsHandler(c echo.Context) error {
 	}
 
 	numberUint := uint(number)
+	tr := repositories.NewGormTaskRepository(db)
+	wr := repositories.NewGormWordRepository(db)
 
-	words, err := usecases.GetTaskWords(numberUint, user)
+	words, err := usecases.GetTaskWords(tr, wr, numberUint, user)
 
 	if err != nil {
 		switch {

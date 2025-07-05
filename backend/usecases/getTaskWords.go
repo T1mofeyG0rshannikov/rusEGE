@@ -1,21 +1,18 @@
 package usecases
 
 import (
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/database/mappers"
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
 )
 
 func GetTaskWords(
+	tr *repositories.GormTaskRepository,
+	wr *repositories.GormWordRepository,
 	taskNumber uint,
-	user *database.User,
+	user *models.User,
 ) ([]interfaces.Word, error) {
-	db := database.GetDB()
-
-	tr := repositories.NewGormTaskRepository(db)
-	wr := repositories.NewGormWordRepository(db)
-
 	task, err := tr.Get(taskNumber)
 
 	if err != nil {

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"errors"
-	"rusEGE/database"
+	"rusEGE/database/models"
 	"rusEGE/database/utils"
 	"rusEGE/exceptions"
 	"rusEGE/web/schemas"
@@ -11,9 +11,9 @@ import (
 )
 
 type TaskRepository interface {
-	Create(word *database.UserWord) error
-	GetAll() ([]*database.Word, error)
-	Get(number uint) (*database.Task, error)
+	Create(word *models.UserWord) error
+	GetAll() ([]*models.Word, error)
+	Get(number uint) (*models.Task, error)
 }
 
 type GormTaskRepository struct {
@@ -24,8 +24,8 @@ func NewGormTaskRepository(db *gorm.DB) *GormTaskRepository {
 	return &GormTaskRepository{db}
 }
 
-func (r *GormTaskRepository) GetAll() ([]*database.Task, error) {
-	var tasks []*database.Task
+func (r *GormTaskRepository) GetAll() ([]*models.Task, error) {
+	var tasks []*models.Task
 	result := r.db.Find(&tasks)
 	if result.Error != nil {
 		return nil, result.Error
@@ -34,7 +34,7 @@ func (r *GormTaskRepository) GetAll() ([]*database.Task, error) {
 	return tasks, nil
 }
 
-func (r *GormTaskRepository) Create(task *database.Task) (*database.Task, error) {
+func (r *GormTaskRepository) Create(task *models.Task) (*models.Task, error) {
 	result := r.db.Create(task)
 	if result.Error != nil {
 		switch {
@@ -64,8 +64,8 @@ func (r *GormTaskRepository) Edit(number uint, data schemas.EditTaskRequest) err
 	return nil
 }
 
-func (r *GormTaskRepository) Get(number uint) (*database.Task, error) {
-	var task database.Task
+func (r *GormTaskRepository) Get(number uint) (*models.Task, error) {
+	var task models.Task
 	result := r.db.Where("Number = ?", number).First(&task)
 
 	if result.Error != nil {
