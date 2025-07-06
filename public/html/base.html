@@ -6,6 +6,7 @@
     <title>Базовая страница</title>
     <link rel="stylesheet" href="/static/css/base.css" />
     <link rel="stylesheet" href="/static/css/task.css" />
+    <link rel="stylesheet" href="/static/css/tasks.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
@@ -16,3 +17,22 @@
 {{ else if eq .contentTemplate "tasks" }}
     {{ template "tasks" . }}
 {{ end }}
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Логин</h2>
+        <form>
+            <label for="name">Username:</label><br>
+            <input type="text" id="name" name="name"><br><br>
+
+            <label for="password">Пароль:</label><br>
+            <input type="password" id="password" name="password"><br><br>
+
+            <label for="password">Пароль:</label><br>
+            <input type="password" id="password" name="password"><br><br>
+
+            <input type="submit" value="Отправить">
+        </form>
+    </div>
+</div>

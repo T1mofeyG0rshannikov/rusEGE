@@ -27,24 +27,60 @@ document.addEventListener('DOMContentLoaded', function() {
                         task.rules.forEach(r => {
                             rulesHTML += `<div class="checkbox">
                                 <label>
-                                    <input type="checkbox" value="${r.id}">
+                                    <input type="checkbox" checked value="${r.id}">
                                     <span>${r.rule}</span>
                                 </label>
                             </div>`
                         })
                         tasksHTML += `
                             <div id="task${task.number}container">
-                                <button class="button" onclick="startTraining(${task.number})">Задание ${task.number}</button> - ${ task.description }
-                                <ul>
+                                <div class="task-title">
+                                    <div>
+                                        <h3>Задание ${task.number}</h3>
+                                        <span>${ task.description }</span>
+                                    </div>
+
+                                    <div>
+                                        <a href="#" id="myLink">Узнать статистику</a>
+                                        <button class="button" onclick="startTraining(${task.number})">Начать тренировку</button>
+                                    </div>
+                                </div>
+                                <ul class="rules">
                                     ${rulesHTML}
                                 </ul>
                             </div>`
                     });
                     document.querySelector("ul").innerHTML = tasksHTML
+                    initModal()
                 })
             }
         })
     }
     getTasks()
     getSeo()
+
+    function initModal(){
+        // Получаем элементы
+        var link = document.getElementById("myLink");
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+
+        // При клике на ссылку открываем форму
+        link.onclick = function(event) {
+        event.preventDefault(); // Предотвращаем переход по ссылке
+        modal.style.display = "block";
+        }
+
+        // При клике на крестик закрываем форму
+        span.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        // При клике вне формы, закрываем ее
+        window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        }
+    }
 })

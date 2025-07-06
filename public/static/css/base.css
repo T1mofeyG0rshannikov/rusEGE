@@ -1,11 +1,9 @@
-/* Общие стили */
 body {
     font-family: sans-serif;
     margin: 0;
     padding: 0;
 }
 
-/* Стили навбара */
 .navbar {
     background-color: #333;
     color: white;
@@ -44,7 +42,6 @@ body {
     font-size: 20px;
 }
 
-/* Стили контента */
 .content {
     padding: 20px;
     height: calc(100vh - 50px);
@@ -71,7 +68,7 @@ body {
     height: 100vh;
     overflow: hidden;
 }
-main{
+.center-content{
     position: absolute;
     top: 50%;
     left: 50%;
@@ -81,3 +78,38 @@ main{
     height: 30px;
     margin: 10px;
 }
+
+
+  #myModal {
+    display: none; /* Скрываем форму по умолчанию */
+    position: fixed; /* Фиксированное позиционирование поверх всего контента */
+    z-index: 1; /* Устанавливаем высокий z-index, чтобы была поверх всего */
+    left: 0;
+    top: 0;
+    width: 100%; /* Полная ширина */
+    height: 100%; /* Полная высота */
+    overflow: auto; /* Добавляем скролл, если форма не помещается */
+    background-color: rgba(0,0,0,0.4); /* Полупрозрачный фон */
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Центрируем по вертикали и горизонтали */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ширина формы */
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
