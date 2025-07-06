@@ -1,21 +1,19 @@
 package usecases
 
 import (
-	"rusEGE/database/models"
 	"rusEGE/database/mappers"
+	"rusEGE/database/models"
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
+	"rusEGE/web/schemas"
 
 	"math/rand"
 	"time"
 )
 
-
-func shuffleSlice(slice []interfaces.Word) {
-	// Инициализируем генератор случайных чисел.
+func shuffleSlice(slice []*interfaces.Word) {
 	rand.Seed(time.Now().UnixNano())
 
-	// Реализация перемешивания Фишера-Йетса (Fisher-Yates shuffle).
 	n := len(slice)
 	for i := n - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)
@@ -23,16 +21,15 @@ func shuffleSlice(slice []interfaces.Word) {
 	}
 }
 
-
 func GetTaskWords(
 	tr *repositories.GormTaskRepository,
 	wr *repositories.GormWordRepository,
-	taskNumber uint,
+	data schemas.GetWordsRequest,
 	user *models.User,
-) ([]interfaces.Word, error) {
-	task, err := tr.Get(taskNumber)
+) ([]*interfaces.Word, error) {
+	task, err := tr.Get(data.Task)
 
-	var mappedWords []interfaces.Word;
+	var mappedWords []*interfaces.Word
 
 	if err != nil {
 		return nil, err
@@ -44,14 +41,14 @@ func GetTaskWords(
 			return nil, err
 		}
 
-		mappedWords = mappers.DbUserWordToWord(words)
+		mappedWords = mappers.DbUserWordsToWords(words)
 	} else {
-		words, err := wr.GetTaskWords(task.Id)
+		words, err := wr.GetTaskWords(task.Id, data.RuleIds)
 		if err != nil {
 			return nil, err
 		}
 
-		mappedWords = mappers.DbWordToWord(words)
+		mappedWords = mappers.DbWordsToWords(words)
 	}
 
 	shuffleSlice(mappedWords)

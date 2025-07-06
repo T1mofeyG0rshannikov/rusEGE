@@ -14,6 +14,7 @@ type TaskRepository interface {
 	Create(word *models.UserWord) error
 	GetAll() ([]*models.Word, error)
 	Get(number uint) (*models.Task, error)
+	GetTaskRules(id uint) ([]*models.Rule, error)
 }
 
 type GormTaskRepository struct {
@@ -32,6 +33,16 @@ func (r *GormTaskRepository) GetAll() ([]*models.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (r *GormTaskRepository) GetTaskRules(id uint) ([]*models.Rule, error) {
+	var rules []*models.Rule
+	result := r.db.Where("Id IN (?)", r.db.Model(&models.Word{}).Select("RuleId").Where("task_id = ?", id)).Find(&rules)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return rules, nil
 }
 
 func (r *GormTaskRepository) Create(task *models.Task) (*models.Task, error) {
@@ -56,7 +67,6 @@ func (r *GormTaskRepository) Edit(number uint, data schemas.EditTaskRequest) err
 
 	task.Description = data.Description
 
-	// Сохраняем изменения в базе данных
 	result := r.db.Save(&task)
 	if result.Error != nil {
 		return err

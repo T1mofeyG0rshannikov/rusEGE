@@ -9,14 +9,13 @@ import (
 	"rusEGE/repositories"
 	"rusEGE/web/schemas"
 	"rusEGE/web/utils"
-	
+
 	"github.com/labstack/echo/v4"
-	
+
 	"rusEGE/auth"
 	"rusEGE/usecases"
 	"strconv"
 )
-
 
 func CreateTaskHandler(c echo.Context) error {
 	var payload schemas.CreateTaskRequest
@@ -104,7 +103,8 @@ func CreateWordHandler(c echo.Context) error {
 	tr := repositories.NewGormTaskRepository(db)
 	wr := repositories.NewGormWordRepository(db)
 
-	task, err := tr.Get(payload.TaskNumber)
+	word, err := usecases.CreateWord(tr, wr, payload)
+
 	if err != nil {
 		switch {
 		case errors.Is(err, exceptions.ErrTaskNotFound):
@@ -118,16 +118,63 @@ func CreateWordHandler(c echo.Context) error {
 		}
 	}
 
-	word, err := wr.Create(&models.Word{
-		TaskId: task.Id,
-		Word:   payload.Word,
-		Rule:   payload.Rule,
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"word": word,
 	})
+}
+
+func BulkCreateWordHandler(c echo.Context) error {
+	var payload schemas.BulkCreateWordRequest
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	db := database.GetDB()
+	tr := repositories.NewGormTaskRepository(db)
+	wr := repositories.NewGormWordRepository(db)
+
+	err := usecases.BulkCreateWord(tr, wr, payload)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": err.Error(),
-		})
+		switch {
+		case errors.Is(err, exceptions.ErrTaskNotFound):
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": err.Error(),
+			})
+		default:
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "something went wrong",
+			})
+		}
+	}
+
+	return c.String(http.StatusOK, "")
+}
+
+func EditWordHandler(c echo.Context) error {
+	var payload schemas.EditWordRequest
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	db := database.GetDB()
+	wr := repositories.NewGormWordRepository(db)
+
+	word, err := usecases.EditWord(wr, payload)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, exceptions.ErrTaskNotFound):
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": err.Error(),
+			})
+		default:
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "something went wrong",
+			})
+		}
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -136,6 +183,12 @@ func CreateWordHandler(c echo.Context) error {
 }
 
 func GetWordsHandler(c echo.Context) error {
+	var payload schemas.GetWordsRequest
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
 	db := database.GetDB()
 
 	user, err := utils.GetUserFromHeader(
@@ -144,20 +197,10 @@ func GetWordsHandler(c echo.Context) error {
 		c,
 	)
 
-	numberStr := c.Param("taskNumber")
-	number, err := strconv.ParseUint(numberStr, 10, 64)
-
-	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": err.Error(),
-		})
-	}
-
-	numberUint := uint(number)
 	tr := repositories.NewGormTaskRepository(db)
 	wr := repositories.NewGormWordRepository(db)
 
-	words, err := usecases.GetTaskWords(tr, wr, numberUint, user)
+	words, err := usecases.GetTaskWords(tr, wr, payload, user)
 
 	if err != nil {
 		switch {
@@ -179,12 +222,11 @@ func GetWordsHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-
 func GetTasksHandler(c echo.Context) error {
 	db := database.GetDB()
 	tr := repositories.NewGormTaskRepository(db)
 
-	tasks, err := tr.GetAll()
+	tasks, err := usecases.GetTasks(tr)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -195,4 +237,24 @@ func GetTasksHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"tasks": tasks,
 	})
+}
+
+func DeleteWordHandler(c echo.Context) error {
+	var payload schemas.DeleteWordsRequest
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	db := database.GetDB()
+	wr := repositories.NewGormWordRepository(db)
+
+	err := wr.Delete(payload.Word)
+	if err != nil{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.String(http.StatusOK, "")
 }

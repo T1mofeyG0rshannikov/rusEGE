@@ -47,7 +47,7 @@ func CreateUser(
 			UserId: userDB.Id,
 			Word: word.Word,
 			TaskId: word.TaskId,
-			Rule: word.Rule,
+			RuleId: word.RuleId,
 		})
 	}
 

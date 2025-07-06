@@ -19,18 +19,24 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.progressbar__value').style.width = percent + '%';
     }
 
-    function checkLetter(correct){
+    function checkLetter(correct, element){
         if (correct){
             index++;
+            element.classList.add("correct")
         }
         if (!correct){
+            element.classList.add("wrong")
             errors++;
             words.push(words[0])
             document.querySelector("#options").classList.add("shake")
+        
+            document.querySelectorAll(".option").forEach((o, ind) => {
+                if (words[0].Options[ind].correct){
+                    o.classList.add("correct")
+                }
+            })
         }
-        document.querySelectorAll(".option").forEach((o, ind) => {
-            o.classList.add(words[0].Options[ind].correct ? "correct" : "wrong")
-        })
+
         updateProgressBar()
         setTimeout(function(){
             document.querySelector("#options").classList.remove("shake")
@@ -55,9 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let words = []
     function getWords(){
-        const taskNum = window.location.href.split('/')[4]
-
-        fetch(`/api/words/get/${taskNum}`).then(response => {
+        const url = window.location.href.split('?')[1]
+        fetch(`/api/words/get?${url}`).then(response => {
             if (response.status == 200){
                 response.json().then(response => {
                     words = response.words
@@ -73,6 +78,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function setWord(){
         document.getElementById("word").textContent = words[0].word
         document.getElementById("rule").textContent = words[0].rule
+        
+        if (words[0].exception){
+            document.getElementById("rule").textContent += ' (Исключение)'
+        }
+
         let optionsHTML = ``;
         words[0].Options.forEach(option => {
             optionsHTML += `<span class="option">${option.letter}</span>`
@@ -80,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("options").innerHTML = optionsHTML
         document.querySelectorAll(".option").forEach((o, ind) => {
             o.addEventListener('click', function(event){
-                checkLetter(words[0].Options[ind].correct)
+                checkLetter(words[0].Options[ind].correct, this)
             })
         })
     }

@@ -2,6 +2,7 @@ package web
 
 import (
 	"rusEGE/web/handlers"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,7 +21,10 @@ func Init() {
 	e.POST("api/tasks/create", handlers.CreateTaskHandler)
 	e.POST("api/tasks/:number/edit", handlers.EditTaskHandler)
 	e.POST("api/words/create", handlers.CreateWordHandler)
-	e.GET("api/words/get/:taskNumber", handlers.GetWordsHandler)
+	e.POST("api/words/bulk-create", handlers.BulkCreateWordHandler)
+	e.POST("api/words/edit", handlers.EditWordHandler)
+	e.DELETE("api/words/delete", handlers.DeleteWordHandler)
+	e.GET("api/words/get", handlers.GetWordsHandler)
 	e.POST("api/indexseo/create", handlers.CreateIndexSeoHandler)
 	e.POST("api/indexseo/edit", handlers.EditIndexSeoHandler)
 	e.GET("api/indexseo", handlers.GetIndexSeoHandler)
