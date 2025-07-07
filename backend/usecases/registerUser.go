@@ -15,16 +15,16 @@ func CreateUser(
 	jwtProcessor *auth.JWTProcessor,
 	hasher *security.ScryptHasher,
 	data *schemas.CreateUserRequest,
-) (*auth.AccessToken, error) {
+) (*auth.AccessToken, *auth.AccessToken, error) {
 	user, err := ur.Get(data.Username)
 
 	if user != nil{
-		return nil, exceptions.ErrUsernameExist
+		return nil, nil, exceptions.ErrUsernameExist
 	}
 
 	hashedPassword, err := hasher.HashPassword(data.Password)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	userDB, err := ur.Create(&models.User{
@@ -33,13 +33,13 @@ func CreateUser(
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	words, err := wr.GetAll()
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	for _, word := range words {
@@ -51,10 +51,16 @@ func CreateUser(
 		})
 	}
 
-	accessToken, err := jwtProcessor.GenerateToken(userDB.Username)
+	accessToken, err := jwtProcessor.GenerateToken(userDB.Username, 30)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &accessToken, nil
+	refreshToken, err := jwtProcessor.GenerateToken(user.Username, 60*24)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return &accessToken, &refreshToken, nil
 }

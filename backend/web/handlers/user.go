@@ -24,7 +24,7 @@ func CreateUserHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	accessToken, err := usecases.CreateUser(
+	accessToken, refreshToken, err := usecases.CreateUser(
 		repositories.NewGormUserRepository(db),
 		repositories.NewGormWordRepository(db),
 		auth.NewJWTProcessor(),
@@ -46,7 +46,8 @@ func CreateUserHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"access_token": accessToken,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 
@@ -59,7 +60,7 @@ func LoginHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	accessToken, err := usecases.LoginUser(
+	accessToken, refreshToken, err := usecases.LoginUser(
 		repositories.NewGormUserRepository(db),
 		security.NewScryptHasher(),
 		auth.NewJWTProcessor(),
@@ -85,7 +86,8 @@ func LoginHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"access_token": accessToken,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 

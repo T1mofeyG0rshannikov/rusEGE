@@ -14,22 +14,28 @@ func LoginUser(
 	hasher *security.ScryptHasher,
 	jwtProcessor *auth.JWTProcessor,
 	data *schemas.LoginRequest,
-) (*auth.AccessToken, error) {
+) (*auth.AccessToken, *auth.AccessToken, error) {
 	user, err := ur.Get(data.Username)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if hasher.CheckPassword(data.Password, user.HashPassword) {
-		accessToken, err := jwtProcessor.GenerateToken(user.Username)
-
+		accessToken, err := jwtProcessor.GenerateToken(user.Username, 30)
+		
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
-		return &accessToken, nil
+		refreshToken, err := jwtProcessor.GenerateToken(user.Username, 60*24)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return &accessToken, &refreshToken, nil
 	}
 
-	return nil, exceptions.ErrIncorrectPassword
+	return nil, nil, exceptions.ErrIncorrectPassword
 }

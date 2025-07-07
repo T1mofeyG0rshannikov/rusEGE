@@ -3,8 +3,6 @@ function getSeo(){
         if (response.status == 200){
             response.json().then(response => {
                 const seo = response.seo;
-                console.log(response)
-                console.log(seo)
                 try{
                     document.querySelector("#image").src = seo.image
                 }

@@ -37,8 +37,8 @@ type Claims struct {
 }
 
 // GenerateToken создает новый JWT токен.
-func (jp *JWTProcessor) GenerateToken(username string) (AccessToken, error) {
-	expirationTime := time.Hour * 24 // Токен будет действовать 24 часа.
+func (jp *JWTProcessor) GenerateToken(username string, storageTimeInMins uint) (AccessToken, error) {
+	expirationTime := time.Minute * time.Duration(int64(storageTimeInMins))
 	expiration := time.Now().Add(expirationTime)
 
 	claims := &Claims{

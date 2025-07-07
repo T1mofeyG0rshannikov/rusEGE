@@ -29,8 +29,8 @@ func Init() {
 	e.POST("api/indexseo/edit", handlers.EditIndexSeoHandler)
 	e.GET("api/indexseo", handlers.GetIndexSeoHandler)
 	e.GET("user/get", handlers.GetUserHandler)
-	e.POST("/login", handlers.LoginHandler)
-	e.POST("/register", handlers.CreateUserHandler)
+	e.POST("/api/login", handlers.LoginHandler)
+	e.POST("/api/register", handlers.CreateUserHandler)
 
 	e.Start(":8080")
 }

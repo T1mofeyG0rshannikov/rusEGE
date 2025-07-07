@@ -6,10 +6,7 @@ function startTraining(task){
         }
     })
 
-    console.log(ruleIds)
-
     const url = `/task/${task}?task=${task}&rule_ids=${ruleIds.join('&rule_ids=')}`
-    console.log(url)
     window.location.href = url
 }
 
@@ -41,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
 
                                     <div>
-                                        <a href="#" id="myLink">Узнать статистику</a>
+                                        <a href="#" onclick="openStatModal(event, ${task.number})">Узнать статистику</a>
                                         <button class="button" onclick="startTraining(${task.number})">Начать тренировку</button>
                                     </div>
                                 </div>
@@ -51,36 +48,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>`
                     });
                     document.querySelector("ul").innerHTML = tasksHTML
-                    initModal()
                 })
             }
         })
     }
     getTasks()
     getSeo()
-
-    function initModal(){
-        // Получаем элементы
-        var link = document.getElementById("myLink");
-        var modal = document.getElementById("myModal");
-        var span = document.getElementsByClassName("close")[0];
-
-        // При клике на ссылку открываем форму
-        link.onclick = function(event) {
-        event.preventDefault(); // Предотвращаем переход по ссылке
-        modal.style.display = "block";
-        }
-
-        // При клике на крестик закрываем форму
-        span.onclick = function() {
-        modal.style.display = "none";
-        }
-
-        // При клике вне формы, закрываем ее
-        window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-        }
-    }
 })
