@@ -15,6 +15,9 @@ type WordRepository interface {
 	GetRule(rule string) (*models.Rule, error)
 	CreateRule(rule *models.Rule) (*models.Rule, error)
 	Delete(word string) error
+	CreateError(userId, wordId uint) error
+	GetWordErrors(wordId uint) (*[]models.Error, error)
+	GetRuleErrorsCount(ruleId uint) (*int64, error)
 }
 
 type GormWordRepository struct {
@@ -25,6 +28,16 @@ func NewGormWordRepository(db *gorm.DB) *GormWordRepository {
 	return &GormWordRepository{db: db}
 }
 
+func (r *GormWordRepository) GetWordErrors(userId, wordId uint) (*[]models.Error, error) {
+	var errors *[]models.Error
+	result := r.db.Where("word_id = ? AND user_id = ?", wordId, userId).Find(&errors)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return errors, nil
+}
+
 func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.UserWord, error) {
 	result := r.db.Create(word)
 	if result.Error != nil {
@@ -32,6 +45,21 @@ func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.User
 	}
 
 	return word, nil
+}
+
+func (r *GormWordRepository) CreateError(userId, wordId uint) (*models.Error, error) {
+	wordError := &models.Error{
+		UserId: userId,
+		WordId: wordId,
+	}
+
+	result := r.db.Create(wordError)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return wordError, nil
 }
 
 func (r *GormWordRepository) Delete(word string) error {
@@ -145,10 +173,25 @@ func (r *GormWordRepository) GetTaskWords(taskId uint, ruleIds *[]uint) ([]*mode
 
 func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint) ([]*models.UserWord, error) {
 	var words []*models.UserWord
-	result := r.db.Where("TaskId = ? UserId = ?", taskId, userId).Find(&words)
+	result := r.db.Where("TaskId = ? AND UserId = ?", taskId, userId).Find(&words)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	return words, nil
+}
+
+func (r *GormWordRepository) GetRuleErrorsCount(ruleId, userId uint) (*int64, error) {
+	var count int64
+	result := r.db.Table("rules").
+		Select("count(errors.id)").
+		Joins("INNER JOIN words ON rules.id = words.rule_id").
+		Joins("INNER JOIN errors ON words.id = errors.word_id").
+		Where("rules.id = ? AND errors.user_id = ?", ruleId, userId). // Добавлено условие по UserId
+		Count(&count)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &count, nil
 }

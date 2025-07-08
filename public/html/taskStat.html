@@ -1,18 +1,12 @@
-{{ define "taskstat" }}
+{{ define "taskStat" }}
 <div id="taskStat" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="close" onclick="closeModal(this)">&times;</span>
         <h2>Статистика по заданию</h2>
-        <form>
-            <label for="name">Username:</label><br>
-            <input type="text" id="name" name="name"><br><br>
+        <p>Количество ошибок, которые вы допустили в словах</p>
+        <ul>
 
-            <label for="password">Пароль:</label><br>
-            <input type="password" id="password" name="password"><br><br>
-
-            <a onclick="openRegisterForm(event)">Зарегистрироваться</a>
-            <input type="submit" value="Отправить">
-        </form>
+        </ul>
     </div>
 </div>
 {{ end }}

@@ -14,6 +14,7 @@ type Rule struct {
 type Word struct {
 	Id        uint   `json:"id"`
 	TaskId    uint   `json:"task_id"`
+	Task      Task   `gorm:"foreignKey:TaskId"`
 	Word      string `json:"word"`
 	RuleId    uint   `json:"rule_id"`
 	Rule      Rule   `gorm:"foreignKey:RuleId"`
@@ -27,11 +28,21 @@ type User struct {
 }
 
 type UserWord struct {
-	Id     uint   `json:"id"`
-	TaskId uint   `json:"task_id"`
-	Word   string `json:"word"`
-	RuleId uint   `json:"rule_id"`
-	Rule   Rule   `gorm:"foreignKey:RuleId"`
-	UserId uint   `json:"user_id"`
+	Id        uint   `json:"id"`
+	TaskId    uint   `json:"task_id"`
+	Task      Task   `gorm:"foreignKey:TaskId"`
+	Word      string `json:"word"`
+	RuleId    uint   `json:"rule_id"`
+	Rule      Rule   `gorm:"foreignKey:RuleId"`
+	UserId    uint   `json:"user_id"`
+	User      User   `gorm:"foreignKey:UserId"`
 	Exception bool   `json:"exception" gorm:"default:false"`
+}
+
+type Error struct {
+	Id     uint `json:"id"`
+	UserId uint `json:"user_id"`
+	User   User `gorm:"foreignKey:UserId"`
+	WordId uint `json:"word_id"`
+	Word   Word `gorm:"foreignKey:WordId"`
 }

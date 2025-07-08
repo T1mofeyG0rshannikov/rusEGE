@@ -10,14 +10,15 @@ function getErrorText(errorCount) {
     return titles[index];
 }
 
+function updateProgressBar() {
+    const percent = Math.max((index / maxSteps) * 100, progressBarPercent);
+    progressBarPercent = percent;
+    document.querySelector('.progressbar__value').style.width = percent + '%';
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     getSeo()
-
-    function updateProgressBar() {
-        const percent = Math.max((index / maxSteps) * 100, progressBarPercent);
-        progressBarPercent = percent;
-        document.querySelector('.progressbar__value').style.width = percent + '%';
-    }
 
     function checkLetter(correct, element){
         if (correct){
@@ -34,6 +35,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (words[0].Options[ind].correct){
                     o.classList.add("correct")
                 }
+            })
+
+            fetch(`/api/word-error/create`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": localStorage.getItem("rusEGE_access_token")
+                },
+            body: JSON.stringify({word_id: words[0].id})}).then(response => {
+                    response.json().then(response => {
+                        console.log(response)
+                    })
             })
         }
 

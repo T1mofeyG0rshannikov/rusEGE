@@ -9,6 +9,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Ключ контекста для хранения информации о пользователе
+const userContextKey = "user"
+
 func GetUserFromHeader(
 	jwtProcessor *auth.JWTProcessor,
 	ur *repositories.GormUserRepository,
@@ -31,4 +34,12 @@ func GetUserFromHeader(
 	}
 
 	return user, nil
+}
+
+func UserFromContext(c echo.Context) *models.User {
+	user, ok := c.Get(userContextKey).(*models.User)
+	if !ok {
+	return nil // Или паникуйте, если это критическая ошибка
+	}
+	return user
 }

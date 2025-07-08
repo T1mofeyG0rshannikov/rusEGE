@@ -18,6 +18,6 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 
 func NewTemplateRenderer() *TemplateRenderer {
 	return &TemplateRenderer{
-		templates: template.Must(template.ParseGlob("../public/html/*.html")),
+		templates: template.Must(template.ParseGlob("../public/**/*.html")),
 	}
 }

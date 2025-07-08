@@ -1,7 +1,7 @@
 package schemas
 
 type GetWordsRequest struct {
-	Task    uint      `query:"task"`
+	Task    uint    `query:"task"`
 	RuleIds *[]uint `query:"rule_ids"`
 }
 
@@ -23,7 +23,7 @@ type CreateWordRequest struct {
 
 type BulkCreateWordRequest struct {
 	TaskNumber uint   `json:"task"`
-	Content string `json:"content"`
+	Content    string `json:"content"`
 }
 
 type EditWordRequest struct {
@@ -35,4 +35,8 @@ type EditWordRequest struct {
 
 type DeleteWordsRequest struct {
 	Word string `query:"word"`
+}
+
+type CreateWordError struct {
+	Word uint `json:"word_id"`
 }

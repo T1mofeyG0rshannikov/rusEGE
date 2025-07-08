@@ -1,10 +1,10 @@
 package database
 
 import (
-	"rusEGE/database/models"
 	"fmt"
 	"log"
 	"os"
+	"rusEGE/database/models"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -28,7 +28,7 @@ func Init() *gorm.DB {
 		log.Fatal(err)
 	}
 
-	db.AutoMigrate(&models.Task{}, &models.Word{}, &models.Rule{}, &models.User{}, &models.UserWord{}, &models.IndexSeo{})
+	db.AutoMigrate(&models.Task{}, &models.Word{}, &models.Error{}, &models.Rule{}, &models.User{}, &models.UserWord{}, &models.IndexSeo{})
 	return db
 }
 

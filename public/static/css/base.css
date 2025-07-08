@@ -132,3 +132,63 @@ body {
 .modal .error{
     color: rgb(200, 50, 50);
 }
+
+
+
+
+
+
+.context-help{
+    position: relative;
+    width: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    height: 15px;
+}
+
+.context-help .text{
+    /*display: none;*/
+    display: none;
+    flex-wrap: wrap;
+    max-width: 300px;
+    min-width: 260px;
+    border: 1px solid var(--dark-color);
+    padding: 10px;
+    border-radius: 5px;
+    background: white;
+    left: calc(100% - 22px);
+    bottom: calc(100% + 10px);
+    position: absolute;
+    font-size: 14px;
+    font-family: var(--main-text-font-family);
+    color: var(--main-text-color);
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
+}
+
+.context-help .text::after {
+    content: '';
+    position: absolute;
+    left: 9px;
+    bottom: -5px;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    border-bottom: 1px solid #b1b1b1;
+    border-right: 1px solid #b1b1b1;
+    background-color: white;
+}
+    
+
+.context-help img{
+    width: 20px;
+    height: 20px;
+}
+
+.context-help:hover .text{
+    display: block;
+}
+
+.task-description{
+    display: flex;
+    gap: 10px;
+}

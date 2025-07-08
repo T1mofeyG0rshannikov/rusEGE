@@ -33,6 +33,7 @@ func WordOptions(word string) []interfaces.Option {
 
 func DbUserWordToWord(dbWord *models.UserWord) *interfaces.Word {
 	return &interfaces.Word{
+		Id:        dbWord.Id,
 		Word:      replaceUpperCaseWithSpaces(dbWord.Word),
 		Rule:      &dbWord.Rule.Rule,
 		Options:   WordOptions(dbWord.Word),
@@ -42,6 +43,7 @@ func DbUserWordToWord(dbWord *models.UserWord) *interfaces.Word {
 
 func DbWordToWord(dbWord *models.Word) *interfaces.Word {
 	return &interfaces.Word{
+		Id:        dbWord.Id,
 		Word:      replaceUpperCaseWithSpaces(dbWord.Word),
 		Rule:      &dbWord.Rule.Rule,
 		Options:   WordOptions(dbWord.Word),

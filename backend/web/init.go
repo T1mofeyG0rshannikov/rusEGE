@@ -2,6 +2,7 @@ package web
 
 import (
 	"rusEGE/web/handlers"
+	"rusEGE/web/middleware"
 
 	"github.com/labstack/echo/v4"
 )
@@ -11,6 +12,13 @@ func Init() {
 
 	t := NewTemplateRenderer()
 	e.Renderer = t
+
+	protectedGroup := e.Group("/")
+	protectedGroup.Use(middleware.AuthMiddleware())
+
+	protectedGroup.POST("api/word-error/create", handlers.CreateWordErrorHandler)
+	protectedGroup.GET("api/task/:number/stat", handlers.GetTaskStatHandler)
+
 	e.Static("/static", "../public/static")
 
 	e.GET("/", handlers.IndexPageHandler)
@@ -29,8 +37,8 @@ func Init() {
 	e.POST("api/indexseo/edit", handlers.EditIndexSeoHandler)
 	e.GET("api/indexseo", handlers.GetIndexSeoHandler)
 	e.GET("user/get", handlers.GetUserHandler)
-	e.POST("/api/login", handlers.LoginHandler)
-	e.POST("/api/register", handlers.CreateUserHandler)
+	e.POST("api/login", handlers.LoginHandler)
+	e.POST("api/register", handlers.CreateUserHandler)
 
 	e.Start(":8080")
 }

@@ -225,8 +225,15 @@ func GetWordsHandler(c echo.Context) error {
 func GetTasksHandler(c echo.Context) error {
 	db := database.GetDB()
 	tr := repositories.NewGormTaskRepository(db)
+	wr := repositories.NewGormWordRepository(db)
 
-	tasks, err := usecases.GetTasks(tr)
+	user, err := utils.GetUserFromHeader(
+		auth.NewJWTProcessor(),
+		repositories.NewGormUserRepository(db),
+		c,
+	)
+
+	tasks, err := usecases.GetTasks(tr, wr, user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -248,13 +255,76 @@ func DeleteWordHandler(c echo.Context) error {
 
 	db := database.GetDB()
 	wr := repositories.NewGormWordRepository(db)
-
 	err := wr.Delete(payload.Word)
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
 		})
 	}
 
 	return c.String(http.StatusOK, "")
+}
+
+func CreateWordErrorHandler(c echo.Context) error {
+	var payload schemas.CreateWordError
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	db := database.GetDB()
+
+	user := utils.UserFromContext(c)
+	if user != nil {
+		wr := repositories.NewGormWordRepository(db)
+
+		wordError, err := wr.CreateError(user.Id, payload.Word)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]uint{"word_error_id": wordError.Id, "word_id": wordError.WordId, "user_id": wordError.UserId})
+	} else {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"message": "Unauth",
+		})
+	}
+}
+
+func GetTaskStatHandler(c echo.Context) error {
+	numberStr := c.Param("number")
+	number, err := strconv.ParseUint(numberStr, 10, 64)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	taskNumber := uint(number)
+
+	db := database.GetDB()
+	tr := repositories.NewGormTaskRepository(db)
+	wr := repositories.NewGormWordRepository(db)
+
+	user := utils.UserFromContext(c)
+
+	stat, err := usecases.GetTaskStat(
+		taskNumber,
+		tr,
+		wr,
+		user,
+	)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"stat": stat,
+	})
 }

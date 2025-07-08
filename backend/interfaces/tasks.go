@@ -1,18 +1,23 @@
 package interfaces
 
-import "rusEGE/database/models"
-
 type Word struct {
+	Id        uint    `json:"id"`
 	Word      string  `json:"word"`
 	Rule      *string `json:"rule"`
 	Exception bool    `json:"exception"`
 	Options   []Option
 }
 
+type TaskRule struct {
+	Id     uint   `json:"id"`
+	Rule   string `json:"rule"`
+	Errors *int64 `json:"errors"`
+}
+
 type Task struct {
-	Number      uint           `json:"number" gorm:"unique"`
-	Description string         `json:"description"`
-	Rules       []*models.Rule `json:"rules"`
+	Number      uint        `json:"number" gorm:"unique"`
+	Description string      `json:"description"`
+	Rules       *[]TaskRule `json:"rules"`
 }
 
 type Option struct {
