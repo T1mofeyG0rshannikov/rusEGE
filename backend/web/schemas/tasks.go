@@ -40,3 +40,9 @@ type DeleteWordsRequest struct {
 type CreateWordError struct {
 	Word uint `json:"word_id"`
 }
+
+type EditRuleRequest struct {
+	Id      uint    `json:"id"`
+	NewRule *string `json:"rule"`
+	Options *[]string `json:"options"`
+}

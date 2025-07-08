@@ -8,7 +8,7 @@ import (
 
 func GetTasks(
 	tr *repositories.GormTaskRepository,
-	wr *repositories.GormWordRepository,
+	rr *repositories.GormRuleRepository,
 	user *models.User,
 ) ([]*interfaces.Task, error) {
 	dbTasks, err := tr.GetAll()
@@ -28,13 +28,14 @@ func GetTasks(
 
 		if len(rules) > 0 && user != nil {
 			for i, dbRule := range rules {
-				ruleErrors, err := wr.GetRuleErrorsCount(dbRule.Id, user.Id)
+				ruleErrors, err := rr.GetErrorsCount(dbRule.Id, user.Id)
 
 				if err != nil {
 					return nil, err
 				}
 
 				taskRules[i] = interfaces.TaskRule{
+					Id:     dbRule.Id,
 					Rule:   dbRule.Rule,
 					Errors: ruleErrors,
 				}
@@ -48,6 +49,7 @@ func GetTasks(
 		} else {
 			for i, dbRule := range rules {
 				taskRules[i] = interfaces.TaskRule{
+					Id:   dbRule.Id,
 					Rule: dbRule.Rule,
 				}
 			}

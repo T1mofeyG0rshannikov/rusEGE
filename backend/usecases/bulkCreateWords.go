@@ -12,6 +12,7 @@ import (
 func BulkCreateWord(
 	tr *repositories.GormTaskRepository,
 	wr *repositories.GormWordRepository,
+	rr *repositories.GormRuleRepository,
 	data schemas.BulkCreateWordRequest,
 ) error {
 	task, err := tr.Get(data.TaskNumber)
@@ -30,12 +31,12 @@ func BulkCreateWord(
 			ruleString = strings.Replace(ruleString, " (искл)", "", 1)
 
 			var rule *models.Rule
-			rule, err = wr.GetRule(ruleString)
+			rule, err = rr.Get(ruleString)
 
 			if err != nil && !errors.Is(err, exceptions.ErrRuleNotFound) {
 				return err
 			} else if errors.Is(err, exceptions.ErrRuleNotFound) {
-				rule, err = wr.CreateRule(&models.Rule{
+				rule, err = rr.Create(&models.Rule{
 					Rule: ruleString,
 				})
 

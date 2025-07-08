@@ -102,8 +102,9 @@ func CreateWordHandler(c echo.Context) error {
 	db := database.GetDB()
 	tr := repositories.NewGormTaskRepository(db)
 	wr := repositories.NewGormWordRepository(db)
+	rr := repositories.NewGormRuleRepository(db)
 
-	word, err := usecases.CreateWord(tr, wr, payload)
+	word, err := usecases.CreateWord(tr, wr, rr, payload)
 
 	if err != nil {
 		switch {
@@ -133,8 +134,9 @@ func BulkCreateWordHandler(c echo.Context) error {
 	db := database.GetDB()
 	tr := repositories.NewGormTaskRepository(db)
 	wr := repositories.NewGormWordRepository(db)
+	rr := repositories.NewGormRuleRepository(db)
 
-	err := usecases.BulkCreateWord(tr, wr, payload)
+	err := usecases.BulkCreateWord(tr, wr, rr, payload)
 
 	if err != nil {
 		switch {
@@ -161,8 +163,9 @@ func EditWordHandler(c echo.Context) error {
 
 	db := database.GetDB()
 	wr := repositories.NewGormWordRepository(db)
+	rr := repositories.NewGormRuleRepository(db)
 
-	word, err := usecases.EditWord(wr, payload)
+	word, err := usecases.EditWord(wr, rr, payload)
 
 	if err != nil {
 		switch {
@@ -225,7 +228,7 @@ func GetWordsHandler(c echo.Context) error {
 func GetTasksHandler(c echo.Context) error {
 	db := database.GetDB()
 	tr := repositories.NewGormTaskRepository(db)
-	wr := repositories.NewGormWordRepository(db)
+	rr := repositories.NewGormRuleRepository(db)
 
 	user, err := utils.GetUserFromHeader(
 		auth.NewJWTProcessor(),
@@ -233,7 +236,7 @@ func GetTasksHandler(c echo.Context) error {
 		c,
 	)
 
-	tasks, err := usecases.GetTasks(tr, wr, user)
+	tasks, err := usecases.GetTasks(tr, rr, user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -326,5 +329,30 @@ func GetTaskStatHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"stat": stat,
+	})
+}
+
+
+func EditRuleHadler(c echo.Context) error {
+	var payload schemas.EditRuleRequest
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	db := database.GetDB()
+
+	rr := repositories.NewGormRuleRepository(db)
+
+	rule, err := usecases.EditRule(rr, payload)
+
+	if err != nil{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"rule": rule,
 	})
 }

@@ -13,6 +13,7 @@ import (
 func CreateWord(
 	tr *repositories.GormTaskRepository,
 	wr *repositories.GormWordRepository,
+	rr *repositories.GormRuleRepository,
 	data schemas.CreateWordRequest,
 ) (*interfaces.Word, error){
 	task, err := tr.Get(data.TaskNumber)
@@ -21,12 +22,12 @@ func CreateWord(
 	}
 
 	var rule *models.Rule
-	rule, err = wr.GetRule(data.Rule)
+	rule, err = rr.Get(data.Rule)
 
 	if err != nil && !errors.Is(err, exceptions.ErrRuleNotFound){
 		return nil, err
 	} else if errors.Is(err, exceptions.ErrRuleNotFound){
-		rule, err = wr.CreateRule(&models.Rule{
+		rule, err = rr.Create(&models.Rule{
 			Rule: data.Rule,
 		})
 

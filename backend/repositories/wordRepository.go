@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"rusEGE/database/models"
-	"rusEGE/exceptions"
 
 	"gorm.io/gorm"
 )
@@ -12,12 +11,9 @@ type WordRepository interface {
 	Get(id *uint) (*models.Word, error)
 	Edit(word *models.Word) (*models.Word, error)
 	GetAll() ([]*models.Word, error)
-	GetRule(rule string) (*models.Rule, error)
-	CreateRule(rule *models.Rule) (*models.Rule, error)
 	Delete(word string) error
 	CreateError(userId, wordId uint) error
 	GetWordErrors(wordId uint) (*[]models.Error, error)
-	GetRuleErrorsCount(ruleId uint) (*int64, error)
 }
 
 type GormWordRepository struct {
@@ -104,15 +100,6 @@ func (r *GormWordRepository) Edit(word *models.Word) (*models.Word, error) {
 	return word, nil
 }
 
-func (r *GormWordRepository) CreateRule(rule *models.Rule) (*models.Rule, error) {
-	result := r.db.Create(rule)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return rule, nil
-}
-
 func (r *GormWordRepository) GetAll() ([]*models.Word, error) {
 	var words []*models.Word
 	result := r.db.Find(&words)
@@ -121,20 +108,6 @@ func (r *GormWordRepository) GetAll() ([]*models.Word, error) {
 	}
 
 	return words, nil
-}
-
-func (r *GormWordRepository) GetRule(ruleContent string) (*models.Rule, error) {
-	var rule *models.Rule
-	result := r.db.Where("Rule = ?", ruleContent).First(&rule)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return nil, exceptions.ErrRuleNotFound
-		}
-
-		return nil, result.Error
-	}
-
-	return rule, nil
 }
 
 func contains(s []uint, str uint) bool {
@@ -155,14 +128,14 @@ func (r *GormWordRepository) GetTaskWords(taskId uint, ruleIds *[]uint) ([]*mode
 			interfaceSlice[i] = d
 		}
 
-		result := r.db.Preload("Rule").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
+		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
 		if result.Error != nil {
 			return nil, result.Error
 		}
 
 		return words, nil
 	} else {
-		result := r.db.Preload("Rule").Where("task_id = ?", taskId).Find(&words)
+		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ?", taskId).Find(&words)
 		if result.Error != nil {
 			return nil, result.Error
 		}
@@ -179,19 +152,4 @@ func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint) ([]*models.Us
 	}
 
 	return words, nil
-}
-
-func (r *GormWordRepository) GetRuleErrorsCount(ruleId, userId uint) (*int64, error) {
-	var count int64
-	result := r.db.Table("rules").
-		Select("count(errors.id)").
-		Joins("INNER JOIN words ON rules.id = words.rule_id").
-		Joins("INNER JOIN errors ON words.id = errors.word_id").
-		Where("rules.id = ? AND errors.user_id = ?", ruleId, userId). // Добавлено условие по UserId
-		Count(&count)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return &count, nil
 }

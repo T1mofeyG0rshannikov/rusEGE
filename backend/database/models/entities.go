@@ -7,8 +7,9 @@ type Task struct {
 }
 
 type Rule struct {
-	Id   uint   `json:"id"`
-	Rule string `json:"rule"`
+	Id      uint          `json:"id"`
+	Rule    string        `json:"rule"`
+	Options *[]RuleOption `json:"options"`
 }
 
 type Word struct {
@@ -45,4 +46,11 @@ type Error struct {
 	User   User `gorm:"foreignKey:UserId"`
 	WordId uint `json:"word_id"`
 	Word   Word `gorm:"foreignKey:WordId"`
+}
+
+type RuleOption struct {
+	Id     uint   `json:"id"`
+	RuleId uint   `json:"rule_id"`
+	Rule   Rule   `gorm:"foreignkey:RuleId"`
+	Letter string `json:"letter"`
 }

@@ -10,6 +10,7 @@ import (
 
 func EditWord(
 	wr *repositories.GormWordRepository,
+	rr *repositories.GormRuleRepository,
 	data schemas.EditWordRequest,
 ) (*models.Word, error) {
 	word, err := wr.Get(&data.Id)
@@ -20,11 +21,11 @@ func EditWord(
 
 	if data.Rule != nil {
 		var rule *models.Rule
-		rule, err := wr.GetRule(*data.Rule)
+		rule, err := rr.Get(*data.Rule)
 		if err != nil && !errors.Is(err, exceptions.ErrRuleNotFound) {
 			return nil, err
 		} else if errors.Is(err, exceptions.ErrRuleNotFound) {
-			rule, err = wr.CreateRule(&models.Rule{
+			rule, err = rr.Create(&models.Rule{
 				Rule: *data.Rule,
 			})
 

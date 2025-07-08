@@ -25,6 +25,7 @@ func Init() {
 	e.GET("/tasks", handlers.TasksPageHandler)
 	e.GET("/task/:number", handlers.TaskPageHandler)
 
+	e.POST("api/rule/edit", handlers.EditRuleHadler)
 	e.GET("api/tasks/get", handlers.GetTasksHandler)
 	e.POST("api/tasks/create", handlers.CreateTaskHandler)
 	e.POST("api/tasks/:number/edit", handlers.EditTaskHandler)

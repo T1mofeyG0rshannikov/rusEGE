@@ -28,7 +28,16 @@ func Init() *gorm.DB {
 		log.Fatal(err)
 	}
 
-	db.AutoMigrate(&models.Task{}, &models.Word{}, &models.Error{}, &models.Rule{}, &models.User{}, &models.UserWord{}, &models.IndexSeo{})
+	db.AutoMigrate(
+		&models.Task{}, 
+		&models.Word{}, 
+		&models.Error{}, 
+		&models.Rule{}, 
+		&models.User{}, 
+		&models.UserWord{}, 
+		&models.IndexSeo{},
+		&models.RuleOption{},
+	)
 	return db
 }
 
