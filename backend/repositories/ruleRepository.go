@@ -87,19 +87,16 @@ func (r *GormRuleRepository) GetById(id uint) (*models.Rule, error) {
 
 func (r *GormRuleRepository) DeleteOptions(ruleId uint) error {
 	result := r.db.Where("rule_id = ?", ruleId).Delete(&models.RuleOption{})
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 func (r *GormRuleRepository) GetErrorsCount(ruleId, userId uint) (*int64, error) {
 	var count int64
 	result := r.db.Table("rules").
-		Select("count(errors.id)").
-		Joins("INNER JOIN words ON rules.id = words.rule_id").
-		Joins("INNER JOIN errors ON words.id = errors.word_id").
-		Where("rules.id = ? AND errors.user_id = ?", ruleId, userId).
+		Select("count(user_errors.id)").
+		Joins("INNER JOIN user_words ON rules.id = user_words.rule_id").
+		Joins("INNER JOIN user_errors ON user_words.id = user_errors.word_id").
+		Where("rules.id = ? AND user_errors.user_id = ?", ruleId, userId).
 		Count(&count)
 	if result.Error != nil {
 		return nil, result.Error

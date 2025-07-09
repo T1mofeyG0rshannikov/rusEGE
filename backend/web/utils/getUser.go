@@ -25,7 +25,7 @@ func GetUserFromHeader(
 
 	claims, err := jwtProcessor.ValidateToken(authHeader)
 	if err != nil {
-		return nil, exceptions.ErrInvalidJwtToken
+		return nil, err
 	}
 
 	user, err := ur.Get(claims.Username)
@@ -39,7 +39,7 @@ func GetUserFromHeader(
 func UserFromContext(c echo.Context) *models.User {
 	user, ok := c.Get(userContextKey).(*models.User)
 	if !ok {
-	return nil // Или паникуйте, если это критическая ошибка
+		return nil // Или паникуйте, если это критическая ошибка
 	}
 	return user
 }

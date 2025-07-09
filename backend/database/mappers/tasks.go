@@ -1,7 +1,6 @@
 package mappers
 
 import (
-	"fmt"
 	"rusEGE/database/models"
 	"rusEGE/interfaces"
 	"strings"
@@ -21,7 +20,6 @@ func replaceUpperCaseWithSpaces(s string) string {
 }
 
 func WordOptions(word *models.Word) []interfaces.Option {
-	fmt.Println(word.Rule.Options)
 	if len(*word.Rule.Options) > 0 {
 		var options []interfaces.Option
 		for _, letter := range word.Word {
@@ -50,22 +48,38 @@ func WordOptions(word *models.Word) []interfaces.Option {
 }
 
 func userWordOptions(word *models.UserWord) []interfaces.Option {
-	fmt.Println(word.Rule.Options)
-	for _, letter := range word.Word {
-		_, exists := interfaces.LETTEROPTIONS[letter]
-
-		if exists {
-			return interfaces.LETTEROPTIONS[letter]
+	if len(*word.Rule.Options) > 0 {
+		var options []interfaces.Option
+		for _, letter := range word.Word {
+			if letter >= 'А' && letter <= 'Я' {
+				for _, option := range *word.Rule.Options {
+					options = append(options, interfaces.Option{
+						Correct: option.Letter == string(letter),
+						Letter:  option.Letter,
+					})
+				}
+			}
 		}
-	}
 
-	return []interfaces.Option{}
+		return options
+	} else {
+		for _, letter := range word.Word {
+			_, exists := interfaces.LETTEROPTIONS[letter]
+
+			if exists {
+				return interfaces.LETTEROPTIONS[letter]
+			}
+		}
+
+		return []interfaces.Option{}
+	}
 }
 
 func DbUserWordToWord(dbWord *models.UserWord) *interfaces.Word {
 	return &interfaces.Word{
 		Id:        dbWord.Id,
 		Word:      replaceUpperCaseWithSpaces(dbWord.Word),
+		Original:  dbWord.Word,
 		Rule:      &dbWord.Rule.Rule,
 		Options:   userWordOptions(dbWord),
 		Exception: dbWord.Exception,
@@ -76,6 +90,7 @@ func DbWordToWord(dbWord *models.Word) *interfaces.Word {
 	return &interfaces.Word{
 		Id:        dbWord.Id,
 		Word:      replaceUpperCaseWithSpaces(dbWord.Word),
+		Original:  dbWord.Word,
 		Rule:      &dbWord.Rule.Rule,
 		Options:   WordOptions(dbWord),
 		Exception: dbWord.Exception,

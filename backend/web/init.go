@@ -13,11 +13,13 @@ func Init() {
 	t := NewTemplateRenderer()
 	e.Renderer = t
 
-	protectedGroup := e.Group("/")
-	protectedGroup.Use(middleware.AuthMiddleware())
+	userRequiredGroup := e.Group("/")
+	userRequiredGroup.Use(middleware.AuthMiddleware())
 
-	protectedGroup.POST("api/word-error/create", handlers.CreateWordErrorHandler)
-	protectedGroup.GET("api/task/:number/stat", handlers.GetTaskStatHandler)
+	userRequiredGroup.POST("api/word-error/create", handlers.CreateWordErrorHandler)
+	userRequiredGroup.DELETE("api/word-error/delete", handlers.DeleteUserErrorHandler)
+	userRequiredGroup.GET("api/task/:number/stat", handlers.GetTaskStatHandler)
+	userRequiredGroup.GET("api/rules/get-stat/:task", handlers.GetRulesStatHandler)
 
 	e.Static("/static", "../public/static")
 
@@ -40,6 +42,7 @@ func Init() {
 	e.GET("user/get", handlers.GetUserHandler)
 	e.POST("api/login", handlers.LoginHandler)
 	e.POST("api/register", handlers.CreateUserHandler)
+	e.POST("api/refresh-token/:token", handlers.RefreshTokenHandler)
 
 	e.Start(":8080")
 }

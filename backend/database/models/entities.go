@@ -42,10 +42,14 @@ type UserWord struct {
 
 type Error struct {
 	Id     uint `json:"id"`
-	UserId uint `json:"user_id"`
-	User   User `gorm:"foreignKey:UserId"`
 	WordId uint `json:"word_id"`
 	Word   Word `gorm:"foreignKey:WordId"`
+}
+
+type UserError struct {
+	Id     uint `json:"id"`
+	WordId uint `json:"word_id"`
+	Word   UserWord `gorm:"foreignKey:WordId"`
 }
 
 type RuleOption struct {

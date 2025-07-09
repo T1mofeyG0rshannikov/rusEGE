@@ -7,7 +7,6 @@ function openRegisterForm(event){
     document.getElementById("register").style.display = "block"
 }
 
-
 function openLoginForm(event){
     event.preventDefault()
     document.querySelectorAll('.modal').forEach(m => {
@@ -27,25 +26,18 @@ function openStatModal(event, task){
         openLoginForm(event)
     }
     else{
-        fetch(`/api/task/${task}/stat`, {
-            headers: {
-                'Authorization': localStorage.getItem("rusEGE_access_token")
+        authRetry(getTaskStatAPI)(task).then(response => {
+            console.log(response)
+
+            document.getElementById("taskStat").style.display = "block"
+            
+            let statHTML = ``;
+            if (response.data.stat != null){
+                for (word of response.data.stat){
+                    statHTML += `<li>${word.word} - ${word.errors}</li>`
+                }
             }
-        }).then(response => {
-            if (response.status == 200){
-                response.json().then(response => {
-                    console.log(response)
-                    document.getElementById("taskStat").style.display = "block"
-                    
-                    let statHTML = ``;
-                    if (response.stat != null){
-                        for (word of response.stat){
-                            statHTML += `<li>${word.word} - ${word.errors}</li>`
-                        }
-                    }
-                    document.getElementById("taskStat").querySelector("ul").innerHTML = statHTML
-                })
-            }
+            document.getElementById("taskStat").querySelector("ul").innerHTML = statHTML         
         })
     }
 }

@@ -36,7 +36,7 @@ func GetTaskWords(
 	}
 
 	if user != nil {
-		words, err := wr.GetTaskUserWords(task.Id, user.Id)
+		words, err := wr.GetTaskUserWords(task.Id, user.Id, data.RuleIds)
 		if err != nil {
 			return nil, err
 		}

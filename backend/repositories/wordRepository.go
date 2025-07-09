@@ -1,7 +1,9 @@
 package repositories
 
 import (
+	"errors"
 	"rusEGE/database/models"
+	"rusEGE/exceptions"
 
 	"gorm.io/gorm"
 )
@@ -24,14 +26,29 @@ func NewGormWordRepository(db *gorm.DB) *GormWordRepository {
 	return &GormWordRepository{db: db}
 }
 
-func (r *GormWordRepository) GetWordErrors(userId, wordId uint) (*[]models.Error, error) {
-	var errors *[]models.Error
-	result := r.db.Where("word_id = ? AND user_id = ?", wordId, userId).Find(&errors)
+func (r *GormWordRepository) GetUserWordErrors(wordId uint) (*[]models.UserError, error) {
+	var errors *[]models.UserError
+	result := r.db.Where("word_id = ?", wordId).Find(&errors)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	return errors, nil
+}
+
+func (r *GormWordRepository) DeleteUserError(wordId, userId uint) error {
+	var userError models.UserError
+	result := r.db.Where("word_id = ? AND user_id = ?", wordId, userId).First(&userError)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return exceptions.ErrRecordNotFound
+		} else {
+			return result.Error
+		}
+	}
+
+	result = r.db.Delete(&userError)
+	return result.Error
 }
 
 func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.UserWord, error) {
@@ -43,9 +60,22 @@ func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.User
 	return word, nil
 }
 
-func (r *GormWordRepository) CreateError(userId, wordId uint) (*models.Error, error) {
+func (r *GormWordRepository) CreateUserError(userId, userWordId uint) (*models.UserError, error) {
+	wordError := models.UserError{
+		WordId: userWordId,
+	}
+
+	result := r.db.Create(&wordError)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &wordError, nil
+}
+
+func (r *GormWordRepository) CreateError(wordId uint) (*models.Error, error) {
 	wordError := &models.Error{
-		UserId: userId,
 		WordId: wordId,
 	}
 
@@ -66,11 +96,7 @@ func (r *GormWordRepository) Delete(word string) error {
 	}
 
 	result = r.db.Delete(wordToDelete)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	return result.Error
 }
 
 func (r *GormWordRepository) Create(word *models.Word) (*models.Word, error) {
@@ -144,12 +170,46 @@ func (r *GormWordRepository) GetTaskWords(taskId uint, ruleIds *[]uint) ([]*mode
 	}
 }
 
-func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint) ([]*models.UserWord, error) {
+func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint, ruleIds *[]uint) ([]*models.UserWord, error) {
 	var words []*models.UserWord
-	result := r.db.Where("TaskId = ? AND UserId = ?", taskId, userId).Find(&words)
+	if ruleIds != nil && len(*ruleIds) != 0 && !contains(*ruleIds, 0) {
+		interfaceSlice := make([]interface{}, len(*ruleIds))
+		for i, d := range *ruleIds {
+			interfaceSlice[i] = d
+		}
+
+		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+
+		return words, nil
+	} else {
+		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ?", taskId).Find(&words)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+
+		return words, nil
+	}
+}
+
+func (r *GormWordRepository) GetByWord(wordContent string) (*models.Word, error) {
+	var word *models.Word
+	result := r.db.Where("word = ?", wordContent).First(&word)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return words, nil
+	return word, nil
+}
+
+func (r *GormWordRepository) GetUserWord(wordContent string) (*models.UserWord, error) {
+	var word *models.UserWord
+	result := r.db.Where("word = ?", wordContent).First(&word)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return word, nil
 }

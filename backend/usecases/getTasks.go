@@ -1,15 +1,12 @@
 package usecases
 
 import (
-	"rusEGE/database/models"
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
 )
 
 func GetTasks(
 	tr *repositories.GormTaskRepository,
-	rr *repositories.GormRuleRepository,
-	user *models.User,
 ) ([]*interfaces.Task, error) {
 	dbTasks, err := tr.GetAll()
 	if err != nil {
@@ -26,18 +23,11 @@ func GetTasks(
 			return nil, err
 		}
 
-		if len(rules) > 0 && user != nil {
+		if len(rules) > 0 {
 			for i, dbRule := range rules {
-				ruleErrors, err := rr.GetErrorsCount(dbRule.Id, user.Id)
-
-				if err != nil {
-					return nil, err
-				}
-
 				taskRules[i] = interfaces.TaskRule{
-					Id:     dbRule.Id,
-					Rule:   dbRule.Rule,
-					Errors: ruleErrors,
+					Id:   dbRule.Id,
+					Rule: dbRule.Rule,
 				}
 			}
 

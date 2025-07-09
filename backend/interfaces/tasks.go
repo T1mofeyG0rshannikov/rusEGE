@@ -3,15 +3,22 @@ package interfaces
 type Word struct {
 	Id        uint    `json:"id"`
 	Word      string  `json:"word"`
+	Original  string  `json:"original"`
 	Rule      *string `json:"rule"`
 	Exception bool    `json:"exception"`
 	Options   []Option
 }
 
 type TaskRule struct {
+	Id   uint   `json:"id"`
+	Rule string `json:"rule"`
+}
+
+type Rule struct {
+	TaskRule
 	Id     uint   `json:"id"`
 	Rule   string `json:"rule"`
-	Errors *int64 `json:"errors"`
+	Errors int64  `json:"errors"`
 }
 
 type Task struct {

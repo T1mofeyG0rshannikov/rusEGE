@@ -3,6 +3,7 @@ package usecases
 import (
 	"rusEGE/database/models"
 	"rusEGE/repositories"
+	"strings"
 )
 
 func GetTaskStat(
@@ -17,7 +18,7 @@ func GetTaskStat(
 		return nil, err
 	}
 
-	words, err := wr.GetTaskWords(task.Id, nil)
+	words, err := wr.GetTaskUserWords(task.Id, user.Id, nil)
 
 	if err != nil {
 		return nil, err
@@ -26,14 +27,14 @@ func GetTaskStat(
 	var stat []map[string]interface{}
 
 	for _, word := range words {
-		errors, err := wr.GetWordErrors(user.Id, word.Id)
+		errors, err := wr.GetUserWordErrors(word.Id)
 		if err != nil {
 			return nil, err
 		}
 
 		if len(*errors) != 0 {
 			stat = append(stat, map[string]interface{}{
-				"word":   word.Word,
+				"word":   strings.ToLower(word.Word),
 				"errors": len(*errors),
 			})
 		}

@@ -3,10 +3,13 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"time"
-	"os"
-	"github.com/golang-jwt/jwt/v5"
 	"log"
+	"os"
+	"rusEGE/exceptions"
+	"strings"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 )
 
@@ -78,17 +81,20 @@ func (jp *JWTProcessor) ValidateToken(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("invalid token: %w", err)
+		if strings.Contains(err.Error(), "token is expired") {
+			return nil, exceptions.ErrTokenExpired
+		}
+		return nil, exceptions.ErrInvalidJwtToken
 	}
 
 	// Проверяем, что токен действителен.
 	if !token.Valid {
-		return nil, errors.New("invalid token")
+		return nil, exceptions.ErrInvalidJwtToken
 	}
 
 	// Проверяем издателя (опционально, но рекомендуется).
 	if claims.Issuer != jp.issuer {
-		return nil, errors.New("invalid issuer")
+		return nil, exceptions.ErrInvalidJwtToken
 	}
 
 	return claims, nil

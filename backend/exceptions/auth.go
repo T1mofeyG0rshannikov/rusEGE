@@ -6,3 +6,4 @@ import (
 
 var ErrInvalidJwtToken = errors.New("invalid JWT token")
 var ErrNoAuthHeader = errors.New("no Auhorization header")
+var ErrTokenExpired = errors.New("token has expired")

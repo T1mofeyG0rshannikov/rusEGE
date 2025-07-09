@@ -127,3 +127,43 @@ func GetUserHandler(c echo.Context) error {
 		"user_id":  user.Id,
 	})
 }
+
+func RefreshTokenHandler(c echo.Context) error {
+	jwtProcessor := auth.NewJWTProcessor()
+
+	refreshTokenFromRequest := c.Param("token")
+
+	claims, err := jwtProcessor.ValidateToken(refreshTokenFromRequest)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	db := database.GetDB()
+	ur := repositories.NewGormUserRepository(db)
+
+	user, err := ur.Get(claims.Username)
+
+	accessToken, err := jwtProcessor.GenerateToken(user.Username, 30)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	refreshToken, err := jwtProcessor.GenerateToken(user.Username, 60*24)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
+}

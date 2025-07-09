@@ -20,33 +20,37 @@ function updateProgressBar() {
 document.addEventListener('DOMContentLoaded', function() {
     getSeo()
 
+    let words = []
+    const wordErrors = new Set()
+
     function checkLetter(correct, element){
+        const word = words[0];
+
         if (correct){
             index++;
             element.classList.add("correct")
+
+            if (!wordErrors.has(word.word)){
+                authRetry(deleteUserErrorAPI)(word).then(response => {
+                    console.log(response)
+                })
+            }
         }
         if (!correct){
             element.classList.add("wrong")
             errors++;
-            words.push(words[0])
+            wordErrors.add(word.word)
+            words.push(word)
             document.querySelector("#options").classList.add("shake")
         
             document.querySelectorAll(".option").forEach((o, ind) => {
-                if (words[0].Options[ind].correct){
+                if (word.Options[ind].correct){
                     o.classList.add("correct")
                 }
             })
-
-            fetch(`/api/word-error/create`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": localStorage.getItem("rusEGE_access_token")
-                },
-            body: JSON.stringify({word_id: words[0].id})}).then(response => {
-                    response.json().then(response => {
-                        console.log(response)
-                    })
+ 
+            authRetry(createErrorAPI)(word).then(response => {
+                console.log(response)
             })
         }
 
@@ -72,38 +76,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000)
     }
 
-    let words = []
     function getWords(){
         const url = window.location.href.split('?')[1]
-        fetch(`/api/words/get?${url}`).then(response => {
-            if (response.status == 200){
-                response.json().then(response => {
-                    words = response.words
-                    console.log(words)
-                    maxSteps = words.length
-                    setWord()
-                })
-            }
+        authRetry(getWordsAPI)(url).then(response => {
+            words = response.data.words
+            console.log(words)
+            maxSteps = words.length
+            setWord()
         })
     }
     getWords()
 
     function setWord(){
-        document.getElementById("word").textContent = words[0].word
-        document.getElementById("rule").textContent = words[0].rule
+        const word = words[0]
+        document.getElementById("word").textContent = word.word
+        document.getElementById("rule").textContent = word.rule
         
-        if (words[0].exception){
+        if (word.exception){
             document.getElementById("rule").textContent += ' (Исключение)'
         }
 
         let optionsHTML = ``;
-        words[0].Options.forEach(option => {
+        word.Options.forEach(option => {
             optionsHTML += `<span class="option">${option.letter}</span>`
         });
         document.getElementById("options").innerHTML = optionsHTML
         document.querySelectorAll(".option").forEach((o, ind) => {
             o.addEventListener('click', function(event){
-                checkLetter(words[0].Options[ind].correct, this)
+                checkLetter(word.Options[ind].correct, this)
             })
         })
     }
