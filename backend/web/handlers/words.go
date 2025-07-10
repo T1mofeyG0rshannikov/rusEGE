@@ -20,10 +20,9 @@ func CreateWordHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
-	wr := repositories.NewGormWordRepository(db)
-	rr := repositories.NewGormRuleRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
+	wr := repositories.NewGormWordRepository(nil)
+	rr := repositories.NewGormRuleRepository(nil)
 
 	word, err := usecases.CreateWord(tr, wr, rr, payload)
 
@@ -52,10 +51,9 @@ func BulkCreateWordHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
-	wr := repositories.NewGormWordRepository(db)
-	rr := repositories.NewGormRuleRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
+	wr := repositories.NewGormWordRepository(nil)
+	rr := repositories.NewGormRuleRepository(nil)
 
 	err := usecases.BulkCreateWord(tr, wr, rr, payload)
 
@@ -82,9 +80,8 @@ func EditWordHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-	wr := repositories.NewGormWordRepository(db)
-	rr := repositories.NewGormRuleRepository(db)
+	wr := repositories.NewGormWordRepository(nil)
+	rr := repositories.NewGormRuleRepository(nil)
 
 	word, err := usecases.EditWord(wr, rr, payload)
 
@@ -200,12 +197,10 @@ func DeleteUserErrorHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	user := utils.UserFromContext(c)
-	
 	db := database.GetDB()
 	wr := repositories.NewGormWordRepository(db)
 
-	err := wr.DeleteUserError(payload.Word, user.Id)
+	err := wr.DeleteUserError(payload.Word)
 
 	if err != nil {
 		switch {

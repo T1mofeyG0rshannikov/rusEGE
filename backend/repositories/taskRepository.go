@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/web/schemas"
@@ -21,6 +22,9 @@ type GormTaskRepository struct {
 }
 
 func NewGormTaskRepository(db *gorm.DB) *GormTaskRepository {
+	if db == nil{
+		db = database.GetDB()
+	}
 	return &GormTaskRepository{db}
 }
 

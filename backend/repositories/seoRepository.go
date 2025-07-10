@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
 
@@ -17,6 +18,9 @@ type GormSeoRepository struct {
 }
 
 func NewGormSeoRepository(db *gorm.DB) *GormSeoRepository {
+	if db == nil{
+		db = database.GetDB()
+	}
 	return &GormSeoRepository{db}
 }
 

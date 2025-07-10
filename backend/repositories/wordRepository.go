@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
 
@@ -23,7 +24,10 @@ type GormWordRepository struct {
 }
 
 func NewGormWordRepository(db *gorm.DB) *GormWordRepository {
-	return &GormWordRepository{db: db}
+	if db == nil {
+		db = database.GetDB()
+	}
+	return &GormWordRepository{db}
 }
 
 func (r *GormWordRepository) GetUserWordErrors(wordId uint) (*[]models.UserError, error) {
@@ -36,9 +40,56 @@ func (r *GormWordRepository) GetUserWordErrors(wordId uint) (*[]models.UserError
 	return errors, nil
 }
 
-func (r *GormWordRepository) DeleteUserError(wordId, userId uint) error {
+func (r *GormWordRepository) DeleteOptions(wordId uint) error {
+	result := r.db.Where("word_id = ?", wordId).Delete(&models.WordOption{})
+	return result.Error
+}
+
+func (r *GormWordRepository) CreateOption(wordId uint, letter string) (*models.WordOption, error) {
+	option := &models.WordOption{
+		WordId: wordId,
+		Letter: letter,
+	}
+
+	result := r.db.Create(&option)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return option, nil
+}
+
+func (r *GormWordRepository) CreateUserOption(wordId uint, letter string) (*models.UserWordOption, error) {
+	option := &models.UserWordOption{
+		WordId: wordId,
+		Letter: letter,
+	}
+
+	result := r.db.Create(&option)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return option, nil
+}
+
+func (r *GormWordRepository) GetWithOptions(id uint) (*models.Word, error) {
+	var word *models.Word
+	result := r.db.Preload("Options").Where("Id = ?", id).First(&word)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, exceptions.ErrRuleNotFound
+		}
+
+		return nil, result.Error
+	}
+
+	return word, nil
+}
+
+func (r *GormWordRepository) DeleteUserError(wordId uint) error {
 	var userError models.UserError
-	result := r.db.Where("word_id = ? AND user_id = ?", wordId, userId).First(&userError)
+	result := r.db.Where("word_id = ?", wordId).First(&userError)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return exceptions.ErrRecordNotFound
@@ -54,7 +105,7 @@ func (r *GormWordRepository) DeleteUserError(wordId, userId uint) error {
 func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.UserWord, error) {
 	result := r.db.Create(word)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrDuplicatedKey){
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
 			return nil, exceptions.ErrWordAlreadyExists
 		}
 		return nil, result.Error
@@ -102,16 +153,24 @@ func (r *GormWordRepository) Delete(word string) error {
 	return result.Error
 }
 
-func (r *GormWordRepository) Create(word *models.Word) (*models.Word, error) {
-	result := r.db.Create(word)
+func (r *GormWordRepository) Create(taskId uint, word string, ruleId uint, exception *bool, description *string) (*models.Word, error) {
+	wordDb := &models.Word{
+		TaskId:      taskId,
+		Word:        word,
+		RuleId:      ruleId,
+		Exception:   *exception,
+		Description: description,
+	}
+
+	result := r.db.Create(wordDb)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrDuplicatedKey){
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
 			return nil, exceptions.ErrWordAlreadyExists
 		}
 		return nil, result.Error
 	}
 
-	return word, nil
+	return wordDb, nil
 }
 
 func (r *GormWordRepository) Get(id uint) (*models.Word, error) {
@@ -132,9 +191,9 @@ func (r *GormWordRepository) Edit(word *models.Word) (*models.Word, error) {
 	return word, nil
 }
 
-func (r *GormWordRepository) GetAll() ([]*models.Word, error) {
+func (r *GormWordRepository) All() ([]*models.Word, error) {
 	var words []*models.Word
-	result := r.db.Find(&words)
+	result := r.db.Preload("Options").Find(&words)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -160,14 +219,14 @@ func (r *GormWordRepository) GetTaskWords(taskId uint, ruleIds *[]uint) ([]*mode
 			interfaceSlice[i] = d
 		}
 
-		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
+		result := r.db.Preload("Rule").Preload("Options").Preload("Rule.Options").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
 		if result.Error != nil {
 			return nil, result.Error
 		}
 
 		return words, nil
 	} else {
-		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ?", taskId).Find(&words)
+		result := r.db.Preload("Rule").Preload("Options").Preload("Rule.Options").Where("task_id = ?", taskId).Find(&words)
 		if result.Error != nil {
 			return nil, result.Error
 		}
@@ -184,14 +243,14 @@ func (r *GormWordRepository) GetTaskUserWords(taskId, userId uint, ruleIds *[]ui
 			interfaceSlice[i] = d
 		}
 
-		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
+		result := r.db.Preload("Rule").Preload("Options").Preload("Rule.Options").Where("task_id = ? AND rule_id IN (?)", taskId, interfaceSlice).Find(&words)
 		if result.Error != nil {
 			return nil, result.Error
 		}
 
 		return words, nil
 	} else {
-		result := r.db.Preload("Rule").Preload("Rule.Options").Where("task_id = ?", taskId).Find(&words)
+		result := r.db.Preload("Rule").Preload("Options").Preload("Rule.Options").Where("task_id = ?", taskId).Find(&words)
 		if result.Error != nil {
 			return nil, result.Error
 		}

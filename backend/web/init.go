@@ -1,6 +1,7 @@
 package web
 
 import (
+	"rusEGE/database"
 	"rusEGE/web/handlers"
 	"rusEGE/web/middleware"
 
@@ -8,6 +9,7 @@ import (
 )
 
 func Init() {
+	database.GetDB()
 	e := echo.New()
 
 	t := NewTemplateRenderer()
@@ -25,7 +27,6 @@ func Init() {
 	userOptionalGroup := e.Group("/")
 	userOptionalGroup.Use(middleware.OptionalUserMiddleware())
 	userOptionalGroup.GET("api/words/get", handlers.GetWordsHandler)
-
 
 	e.Static("/static", "../public/static")
 

@@ -15,10 +15,11 @@ type EditTaskRequest struct {
 }
 
 type CreateWordRequest struct {
-	TaskNumber uint   `json:"task"`
-	Word       string `json:"word"`
-	Rule       string `json:"rule"`
-	Exception  bool   `json:"exception"`
+	TaskNumber  uint    `json:"task"`
+	Word        string  `json:"word"`
+	Rule        string  `json:"rule"`
+	Exception   bool    `json:"exception"`
+	Description *string `json:"description"`
 }
 
 type BulkCreateWordRequest struct {
@@ -27,10 +28,11 @@ type BulkCreateWordRequest struct {
 }
 
 type EditWordRequest struct {
-	Id        uint    `json:"id"`
-	Word      *string `json:"word"`
-	Rule      *string `json:"rule"`
-	Exception *bool   `json:"exception"`
+	Id        uint      `json:"id"`
+	Word      *string   `json:"word"`
+	Rule      *string   `json:"rule"`
+	Exception *bool     `json:"exception"`
+	Options   *[]string `json:"options"`
 }
 
 type DeleteWordsRequest struct {

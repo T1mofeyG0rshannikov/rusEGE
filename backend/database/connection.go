@@ -29,13 +29,15 @@ func Init() *gorm.DB {
 	}
 
 	db.AutoMigrate(
-		&models.Task{}, 
-		&models.Word{}, 
+		&models.Task{},
+		&models.Word{},
+		&models.WordOption{},
+		&models.UserWordOption{},
 		&models.Error{},
 		&models.UserError{},
-		&models.Rule{}, 
-		&models.User{}, 
-		&models.UserWord{}, 
+		&models.Rule{},
+		&models.User{},
+		&models.UserWord{},
 		&models.IndexSeo{},
 		&models.RuleOption{},
 	)

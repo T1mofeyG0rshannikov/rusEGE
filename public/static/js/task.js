@@ -16,12 +16,27 @@ function updateProgressBar() {
     document.querySelector('.progressbar__value').style.width = percent + '%';
 }
 
-
 document.addEventListener('DOMContentLoaded', function() {
     getSeo()
 
     let words = []
     const wordErrors = new Set()
+
+    function nextWord(){
+        if (words.length == 1){
+            document.querySelector(".word-wrapper").innerHTML = `
+                <p class="success">Отлично!</p>
+                <p style="font-size: 20px;">Вы допустили ${errors} ${getErrorText(errors)}</p>
+                <div class="finish-buttons">
+                    <button class="button" onclick="window.location.reload()">Ещё раз</button>
+                    <button class="button" onclick="window.location.href='/'">На главную</button>
+                </div>
+            `
+            return
+        }
+        words = words.slice(1)
+        setWord()
+    }
 
     function checkLetter(correct, element){
         const word = words[0];
@@ -35,6 +50,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log(response)
                 })
             }
+
+            setTimeout(function(){
+                document.querySelector("#options").classList.remove("shake")
+                document.querySelectorAll(".option").forEach((o, ind) => {
+                    o.classList.remove(word.options[ind].correct ? "correct" : "wrong")
+                })
+                nextWord()
+            }, 1000)
         }
         if (!correct){
             element.classList.add("wrong")
@@ -44,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector("#options").classList.add("shake")
         
             document.querySelectorAll(".option").forEach((o, ind) => {
-                if (word.Options[ind].correct){
+                if (word.options[ind].correct){
                     o.classList.add("correct")
                 }
             })
@@ -52,28 +75,28 @@ document.addEventListener('DOMContentLoaded', function() {
             authRetry(createErrorAPI)(word).then(response => {
                 console.log(response)
             })
+
+            function openDescription(word){
+                const modal = document.getElementById("description")
+                modal.style.display = "block"
+                modal.querySelector(".description-content").textContent = word.description
+            }
+
+            setTimeout(function(){
+                document.querySelector("#options").classList.remove("shake")
+                document.querySelectorAll(".option").forEach((o, ind) => {
+                    o.classList.remove(word.options[ind].correct ? "correct" : "wrong")
+                })
+                if (word.description){
+                    openDescription(word)
+                }
+                else{
+                    nextWord()
+                }
+            }, 1000)
         }
 
         updateProgressBar()
-        setTimeout(function(){
-            document.querySelector("#options").classList.remove("shake")
-            document.querySelectorAll(".option").forEach((o, ind) => {
-                o.classList.remove(words[0].Options[ind].correct ? "correct" : "wrong")
-            })
-            if (words.length == 1){
-                document.querySelector(".word-wrapper").innerHTML = `
-                    <p class="success">Отлично!</p>
-                    <p style="font-size: 20px;">Вы допустили ${errors} ${getErrorText(errors)}</p>
-                    <div class="finish-buttons">
-                        <button class="button" onclick="window.location.reload()">Ещё раз</button>
-                        <button class="button" onclick="window.location.href='/'">На главную</button>
-                    </div>
-                `
-                return
-            }
-            words = words.slice(1)
-            setWord()
-        }, 1000)
     }
 
     function getWords(){
@@ -97,14 +120,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         let optionsHTML = ``;
-        word.Options.forEach(option => {
+        word.options.forEach(option => {
             optionsHTML += `<span class="option">${option.letter}</span>`
         });
         document.getElementById("options").innerHTML = optionsHTML
         document.querySelectorAll(".option").forEach((o, ind) => {
             o.addEventListener('click', function(event){
-                checkLetter(word.Options[ind].correct, this)
+                checkLetter(word.options[ind].correct, this)
             })
         })
     }
+
+    document.querySelector("#description").addEventListener("click", function (){
+        document.getElementById("description").style.display = "none"
+        nextWord()
+    })
 })

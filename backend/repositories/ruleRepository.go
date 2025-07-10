@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
 
@@ -22,16 +23,23 @@ type GormRuleRepository struct {
 }
 
 func NewGormRuleRepository(db *gorm.DB) *GormRuleRepository {
-	return &GormRuleRepository{db: db}
+	if db == nil{
+		db = database.GetDB()
+	}
+	return &GormRuleRepository{db}
 }
 
-func (r *GormRuleRepository) Create(rule *models.Rule) (*models.Rule, error) {
-	result := r.db.Create(rule)
+func (r *GormRuleRepository) Create(rule string) (*models.Rule, error) {
+	ruleDb := &models.Rule{
+		Rule: rule,
+	}
+
+	result := r.db.Create(ruleDb)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return rule, nil
+	return ruleDb, nil
 }
 
 func (r *GormRuleRepository) CreateOption(option *models.RuleOption) (*models.RuleOption, error) {

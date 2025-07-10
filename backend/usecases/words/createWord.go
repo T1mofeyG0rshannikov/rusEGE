@@ -1,13 +1,10 @@
 package words
 
 import (
-	"errors"
-	"rusEGE/database/models"
-	"rusEGE/exceptions"
+	"rusEGE/database/mappers"
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
 	"rusEGE/web/schemas"
-	"rusEGE/database/mappers"
 )
 
 func CreateWord(
@@ -15,36 +12,22 @@ func CreateWord(
 	wr *repositories.GormWordRepository,
 	rr *repositories.GormRuleRepository,
 	data schemas.CreateWordRequest,
-) (*interfaces.Word, error){
+) (*interfaces.Word, error) {
 	task, err := tr.Get(data.TaskNumber)
 	if err != nil {
 		return nil, err
 	}
 
-	var rule *models.Rule
-	rule, err = rr.Get(data.Rule)
-
-	if err != nil && !errors.Is(err, exceptions.ErrRuleNotFound){
-		return nil, err
-	} else if errors.Is(err, exceptions.ErrRuleNotFound){
-		rule, err = rr.Create(&models.Rule{
-			Rule: data.Rule,
-		})
-
-		if err != nil{
-			return nil, err
-		}
-	}
-
-	word, err := wr.Create(&models.Word{
-		TaskId: task.Id,
-		Word:   data.Word,
-		RuleId:   rule.Id,
-	})
-
-	if err != nil{
+	rule, err := GetOrCreateRule(data.Rule)
+	if err != nil {
 		return nil, err
 	}
 
-	return mappers.DbWordToWord(word), nil
+	word, err := wr.Create(task.Id, data.Word, rule.Id, &data.Exception, data.Description)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return mappers.DbWordToWord(*word), nil
 }

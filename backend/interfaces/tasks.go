@@ -1,12 +1,13 @@
 package interfaces
 
 type Word struct {
-	Id        uint    `json:"id"`
-	Word      string  `json:"word"`
-	Original  string  `json:"original"`
-	Rule      *string `json:"rule"`
-	Exception bool    `json:"exception"`
-	Options   []Option
+	Id          uint     `json:"id"`
+	Word        string   `json:"word"`
+	Original    string   `json:"original"`
+	Rule        *string  `json:"rule"`
+	Exception   bool     `json:"exception"`
+	Options     []Option `json:"options"`
+	Description *string  `json:"description"`
 }
 
 type TaskRule struct {

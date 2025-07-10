@@ -220,3 +220,7 @@
 	visibility: visible;
 	opacity: 1;
 }
+.button-wrapper{
+    display: flex;
+    justify-content: end;
+}

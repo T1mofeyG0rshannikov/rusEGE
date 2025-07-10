@@ -19,11 +19,11 @@ func CreateUser(
 ) (*auth.AccessToken, *auth.AccessToken, error) {
 	_, err := ur.Get(data.Username)
 
-	if err != nil{
-		if !errors.Is(err, exceptions.ErrUserNotFound){
+	if err != nil {
+		if !errors.Is(err, exceptions.ErrUserNotFound) {
 			return nil, nil, err
 		}
-	} else{
+	} else {
 		return nil, nil, exceptions.ErrUsernameExist
 	}
 
@@ -38,19 +38,30 @@ func CreateUser(
 		return nil, nil, err
 	}
 
-	words, err := wr.GetAll()
+	words, err := wr.All()
 
 	if err != nil {
 		return nil, nil, err
 	}
 
 	for _, word := range words {
-		wr.CreateUserWord(&models.UserWord{
+		userWord, err := wr.CreateUserWord(&models.UserWord{
 			UserId: user.Id,
 			Word:   word.Word,
 			TaskId: word.TaskId,
 			RuleId: word.RuleId,
 		})
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		for _, option := range word.Options {
+			_, err := wr.CreateUserOption(userWord.Id, option.Letter)
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	accessToken, err := jwtProcessor.GenerateToken(user.Username, 30)

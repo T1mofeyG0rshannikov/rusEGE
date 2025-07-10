@@ -5,14 +5,16 @@ function submitLogin(event){
     const form = modal.querySelector("form")
     const data = new FormData(form)
 
-    console.log(data)
+    const object = {};
+    data.forEach((value, key) => object[key] = value);
+    const json = JSON.stringify(object);
 
     fetch("/api/login", {
         method: "POST",
         headers: {
             'Content-type': 'application/json'
         },
-        body: data
+        body: json
     }).then(response => {
         console.log(response)
         if (!response.ok){

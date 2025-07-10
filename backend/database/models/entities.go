@@ -7,19 +7,28 @@ type Task struct {
 }
 
 type Rule struct {
-	Id      uint          `json:"id"`
-	Rule    string        `json:"rule"`
-	Options *[]RuleOption `json:"options"`
+	Id      uint         `json:"id"`
+	Rule    string       `json:"rule"`
+	Options []RuleOption `json:"options"`
 }
 
 type Word struct {
-	Id        uint   `json:"id"`
-	TaskId    uint   `json:"task_id"`
-	Task      Task   `gorm:"foreignKey:TaskId"`
-	Word      string `json:"word" gorm:"unique"`
-	RuleId    uint   `json:"rule_id"`
-	Rule      Rule   `gorm:"foreignKey:RuleId"`
-	Exception bool   `json:"exception" gorm:"default:false"`
+	Id          uint         `json:"id"`
+	TaskId      uint         `json:"task_id"`
+	Task        Task         `gorm:"foreignKey:TaskId"`
+	Word        string       `json:"word" gorm:"unique"`
+	RuleId      uint         `json:"rule_id"`
+	Rule        Rule         `gorm:"foreignKey:RuleId"`
+	Exception   bool         `json:"exception" gorm:"default:false"`
+	Description *string      `json:"description"`
+	Options     []WordOption `json:"options"`
+}
+
+type WordOption struct {
+	Id     uint   `json:"id"`
+	WordId uint   `json:"word_id"`
+	Word   Word   `gorm:"foreignKey:WordId"`
+	Letter string `json:"letter"`
 }
 
 type User struct {
@@ -29,15 +38,24 @@ type User struct {
 }
 
 type UserWord struct {
-	Id        uint   `json:"id"`
-	TaskId    uint   `json:"task_id"`
-	Task      Task   `gorm:"foreignKey:TaskId"`
-	Word      string `json:"word" gorm:"unique"`
-	RuleId    uint   `json:"rule_id"`
-	Rule      Rule   `gorm:"foreignKey:RuleId"`
-	UserId    uint   `json:"user_id"`
-	User      User   `gorm:"foreignKey:UserId"`
-	Exception bool   `json:"exception" gorm:"default:false"`
+	Id          uint             `json:"id"`
+	TaskId      uint             `json:"task_id"`
+	Task        Task             `gorm:"foreignKey:TaskId"`
+	Word        string           `json:"word" gorm:"unique"`
+	RuleId      uint             `json:"rule_id"`
+	Rule        Rule             `gorm:"foreignKey:RuleId"`
+	UserId      uint             `json:"user_id"`
+	User        User             `gorm:"foreignKey:UserId"`
+	Exception   bool             `json:"exception" gorm:"default:false"`
+	Description *string          `json:"description"`
+	Options     []UserWordOption `json:"options" gorm:"foreignKey:WordId"`
+}
+
+type UserWordOption struct {
+	Id     uint     `json:"id"`
+	WordId uint     `json:"word_id"`
+	Word   UserWord `gorm:"foreignKey:WordId"`
+	Letter string   `json:"letter"`
 }
 
 type Error struct {
