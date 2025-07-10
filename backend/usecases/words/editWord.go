@@ -13,7 +13,7 @@ func EditWord(
 	rr *repositories.GormRuleRepository,
 	data schemas.EditWordRequest,
 ) (*models.Word, error) {
-	word, err := wr.Get(&data.Id)
+	word, err := wr.Get(data.Id)
 
 	if err != nil {
 		return nil, err

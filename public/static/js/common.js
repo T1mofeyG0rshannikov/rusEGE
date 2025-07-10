@@ -32,12 +32,17 @@ function openStatModal(event, task){
             document.getElementById("taskStat").style.display = "block"
             
             let statHTML = ``;
-            if (response.data.stat != null){
-                for (word of response.data.stat){
-                    statHTML += `<li>${word.word} - ${word.errors}</li>`
+            if (response.status == 200){
+                if (response.data.stat != null){
+                    for (word of response.data.stat){
+                        statHTML += `<li>${word.word} - ${word.errors}</li>`
+                    }
+                    statHTML = `<ul>${statHTML}</ul>`
+                } else{
+                    statHTML += '<p>Поздравляю! Ты не совершил ни одной ошибки</p>'
                 }
             }
-            document.getElementById("taskStat").querySelector("ul").innerHTML = statHTML         
+            document.getElementById("taskStat").querySelector(".stat-content").innerHTML = statHTML         
         })
     }
 }

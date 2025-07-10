@@ -8,7 +8,7 @@ import (
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
 	"rusEGE/security"
-	"rusEGE/usecases"
+	usecases "rusEGE/usecases/auth"
 	"rusEGE/web/schemas"
 	"rusEGE/web/utils"
 
@@ -16,20 +16,20 @@ import (
 )
 
 func CreateUserHandler(c echo.Context) error {
-	db := database.GetDB()
-
 	var payload schemas.CreateUserRequest
 
 	if err := c.Bind(&payload); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
+
+	db := database.GetDB()
 
 	accessToken, refreshToken, err := usecases.CreateUser(
 		repositories.NewGormUserRepository(db),
 		repositories.NewGormWordRepository(db),
 		auth.NewJWTProcessor(),
 		security.NewScryptHasher(),
-		&payload,
+		payload,
 	)
 
 	if err != nil {
@@ -92,35 +92,7 @@ func LoginHandler(c echo.Context) error {
 }
 
 func GetUserHandler(c echo.Context) error {
-	db := database.GetDB()
-
-	user, err := utils.GetUserFromHeader(
-		auth.NewJWTProcessor(),
-		repositories.NewGormUserRepository(db),
-		c,
-	)
-
-	if err != nil {
-		switch {
-		case errors.Is(err, exceptions.ErrUserNotFound):
-			return c.JSON(http.StatusNotFound, map[string]interface{}{
-				"message": err.Error(),
-			})
-
-		case errors.Is(err, exceptions.ErrNoAuthHeader):
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"message": err.Error(),
-			})
-		case errors.Is(err, exceptions.ErrInvalidJwtToken):
-			return c.JSON(http.StatusNonAuthoritativeInfo, map[string]interface{}{
-				"message": err.Error(),
-			})
-		default:
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"message": "something went wrong",
-			})
-		}
-	}
+	user := utils.UserFromContext(c)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"username": user.Username,
@@ -145,6 +117,12 @@ func RefreshTokenHandler(c echo.Context) error {
 	ur := repositories.NewGormUserRepository(db)
 
 	user, err := ur.Get(claims.Username)
+
+	if err != nil{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
 
 	accessToken, err := jwtProcessor.GenerateToken(user.Username, 30)
 

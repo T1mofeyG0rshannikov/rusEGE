@@ -6,14 +6,11 @@ import (
 	"rusEGE/database"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
-	"rusEGE/usecases/words"
+	usecases "rusEGE/usecases/words"
 	"rusEGE/web/schemas"
 	"rusEGE/web/utils"
 
 	"github.com/labstack/echo/v4"
-
-	"rusEGE/auth"
-	"rusEGE/usecases"
 )
 
 func CreateWordHandler(c echo.Context) error {
@@ -28,7 +25,7 @@ func CreateWordHandler(c echo.Context) error {
 	wr := repositories.NewGormWordRepository(db)
 	rr := repositories.NewGormRuleRepository(db)
 
-	word, err := words.CreateWord(tr, wr, rr, payload)
+	word, err := usecases.CreateWord(tr, wr, rr, payload)
 
 	if err != nil {
 		switch {
@@ -89,7 +86,7 @@ func EditWordHandler(c echo.Context) error {
 	wr := repositories.NewGormWordRepository(db)
 	rr := repositories.NewGormRuleRepository(db)
 
-	word, err := words.EditWord(wr, rr, payload)
+	word, err := usecases.EditWord(wr, rr, payload)
 
 	if err != nil {
 		switch {
@@ -118,11 +115,7 @@ func GetWordsHandler(c echo.Context) error {
 
 	db := database.GetDB()
 
-	user, err := utils.GetUserFromHeader(
-		auth.NewJWTProcessor(),
-		repositories.NewGormUserRepository(db),
-		c,
-	)
+	user := utils.UserFromContext(c)
 
 	tr := repositories.NewGormTaskRepository(db)
 	wr := repositories.NewGormWordRepository(db)
@@ -180,7 +173,7 @@ func CreateWordErrorHandler(c echo.Context) error {
 	user := utils.UserFromContext(c)
 	wr := repositories.NewGormWordRepository(db)
 
-	userError, wordError, err := words.CreateError(wr, payload, user)
+	userError, wordError, err := usecases.CreateError(wr, payload, user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -207,9 +200,9 @@ func DeleteUserErrorHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-
 	user := utils.UserFromContext(c)
+	
+	db := database.GetDB()
 	wr := repositories.NewGormWordRepository(db)
 
 	err := wr.DeleteUserError(payload.Word, user.Id)

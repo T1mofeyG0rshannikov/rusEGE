@@ -5,15 +5,13 @@ import (
 	"rusEGE/auth"
 	"rusEGE/database"
 	"rusEGE/repositories"
+	"rusEGE/web/config"
 	"rusEGE/web/utils"
 
 	"github.com/labstack/echo/v4"
 )
 
-// Ключ контекста для хранения информации о пользователе
-const userContextKey = "user"
-
-func AuthMiddleware() echo.MiddlewareFunc {
+func UserRequiredMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			db := database.GetDB()
@@ -28,8 +26,7 @@ func AuthMiddleware() echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized: " + err.Error()})
 			}
 
-			// Создаем новый контекст с информацией о пользователе
-			c.Set(userContextKey, user)
+			c.Set(config.UserContextKey, user)
 
 			return next(c)
 		}

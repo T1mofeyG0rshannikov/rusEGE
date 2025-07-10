@@ -9,6 +9,9 @@ function submitLogin(event){
 
     fetch("/api/login", {
         method: "POST",
+        headers: {
+            'Content-type': 'application/json'
+        },
         body: data
     }).then(response => {
         console.log(response)

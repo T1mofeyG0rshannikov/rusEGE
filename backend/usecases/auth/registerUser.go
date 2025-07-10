@@ -1,6 +1,7 @@
-package usecases
+package auth
 
 import (
+	"errors"
 	"rusEGE/auth"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
@@ -14,11 +15,15 @@ func CreateUser(
 	wr *repositories.GormWordRepository,
 	jwtProcessor *auth.JWTProcessor,
 	hasher *security.ScryptHasher,
-	data *schemas.CreateUserRequest,
+	data schemas.CreateUserRequest,
 ) (*auth.AccessToken, *auth.AccessToken, error) {
-	user, err := ur.Get(data.Username)
+	_, err := ur.Get(data.Username)
 
-	if user != nil{
+	if err != nil{
+		if !errors.Is(err, exceptions.ErrUserNotFound){
+			return nil, nil, err
+		}
+	} else{
 		return nil, nil, exceptions.ErrUsernameExist
 	}
 
@@ -27,10 +32,7 @@ func CreateUser(
 		return nil, nil, err
 	}
 
-	userDB, err := ur.Create(&models.User{
-		Username:     data.Username,
-		HashPassword: hashedPassword,
-	})
+	user, err := ur.Create(data.Username, hashedPassword)
 
 	if err != nil {
 		return nil, nil, err
@@ -44,14 +46,14 @@ func CreateUser(
 
 	for _, word := range words {
 		wr.CreateUserWord(&models.UserWord{
-			UserId: userDB.Id,
-			Word: word.Word,
+			UserId: user.Id,
+			Word:   word.Word,
 			TaskId: word.TaskId,
 			RuleId: word.RuleId,
 		})
 	}
 
-	accessToken, err := jwtProcessor.GenerateToken(userDB.Username, 30)
+	accessToken, err := jwtProcessor.GenerateToken(user.Username, 30)
 	if err != nil {
 		return nil, nil, err
 	}

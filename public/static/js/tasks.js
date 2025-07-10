@@ -12,7 +12,7 @@ function startTraining(task){
 
 function loadRulesStatHint(elem){
     if (localStorage.getItem("rusEGE_access_token") === null){
-        elem.querySelector(".text").textContent = "Для того, чтобы увидеть статистику по правилам внутри задания войлите в аккаунт"
+        elem.querySelector(".text").textContent = "Для того, чтобы увидеть статистику по правилам внутри задания войдите в аккаунт"
     } else{
         taskNum = elem.getAttribute("data-task")
         authRetry(getRulesStatAPI)(taskNum).then(response => {
@@ -78,9 +78,7 @@ function getTasks(){
         document.querySelector("ul").innerHTML = tasksHTML
 
         document.querySelectorAll(".context-help").forEach(i => {
-            i.addEventListener("mouseenter", function(){
-                loadRulesStatHint(i)
-            })
+            i.addEventListener("mouseenter", () => loadRulesStatHint(i))
         })
     })
 }

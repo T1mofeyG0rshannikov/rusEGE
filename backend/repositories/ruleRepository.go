@@ -94,9 +94,9 @@ func (r *GormRuleRepository) GetErrorsCount(ruleId, userId uint) (*int64, error)
 	var count int64
 	result := r.db.Table("rules").
 		Select("count(user_errors.id)").
-		Joins("INNER JOIN user_words ON rules.id = user_words.rule_id").
-		Joins("INNER JOIN user_errors ON user_words.id = user_errors.word_id").
-		Where("rules.id = ? AND user_errors.user_id = ?", ruleId, userId).
+		Joins("INNER JOIN user_words ON rules.id = user_words.rule_id AND user_words.user_id = ?").
+		Joins("INNER JOIN user_errors ON user_errors.word_id = user_words.id").
+		Where("rules.id = ?", userId, ruleId).
 		Count(&count)
 	if result.Error != nil {
 		return nil, result.Error

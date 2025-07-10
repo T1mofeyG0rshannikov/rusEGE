@@ -1,4 +1,4 @@
-package usecases
+package rules
 
 import (
 	"rusEGE/database/models"

@@ -1,13 +1,21 @@
-function submitRegister(event, form){
+function submitRegister(event){
     event.preventDefault();
 
+    const modal = document.getElementById("register")
+    const form = modal.querySelector("form")
     const data = new FormData(form)
+    data.delete('repeat-password')
 
-    console.log(data)
+    const object = {};
+    data.forEach((value, key) => object[key] = value);
+    const json = JSON.stringify(object);
 
     fetch("/api/register", {
         method: "POST",
-        body: data
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: json
     }).then(response => {
         if (!response.ok){
             response.json().then(response => {
@@ -19,7 +27,7 @@ function submitRegister(event, form){
             response.json().then(response => {
                 console.log(response)
                 setAuthToken(response.access_token, response.refresh_token)
-                form.style.display = "none"
+                modal.style.display = "none"
             })
         }
     })

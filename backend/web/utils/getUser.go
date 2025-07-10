@@ -5,12 +5,11 @@ import (
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
+	"rusEGE/web/config"
 
 	"github.com/labstack/echo/v4"
 )
 
-// Ключ контекста для хранения информации о пользователе
-const userContextKey = "user"
 
 func GetUserFromHeader(
 	jwtProcessor *auth.JWTProcessor,
@@ -37,7 +36,7 @@ func GetUserFromHeader(
 }
 
 func UserFromContext(c echo.Context) *models.User {
-	user, ok := c.Get(userContextKey).(*models.User)
+	user, ok := c.Get(config.UserContextKey).(*models.User)
 	if !ok {
 		return nil // Или паникуйте, если это критическая ошибка
 	}

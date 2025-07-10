@@ -54,6 +54,9 @@ func (r *GormWordRepository) DeleteUserError(wordId, userId uint) error {
 func (r *GormWordRepository) CreateUserWord(word *models.UserWord) (*models.UserWord, error) {
 	result := r.db.Create(word)
 	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey){
+			return nil, exceptions.ErrWordAlreadyExists
+		}
 		return nil, result.Error
 	}
 
@@ -102,13 +105,16 @@ func (r *GormWordRepository) Delete(word string) error {
 func (r *GormWordRepository) Create(word *models.Word) (*models.Word, error) {
 	result := r.db.Create(word)
 	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey){
+			return nil, exceptions.ErrWordAlreadyExists
+		}
 		return nil, result.Error
 	}
 
 	return word, nil
 }
 
-func (r *GormWordRepository) Get(id *uint) (*models.Word, error) {
+func (r *GormWordRepository) Get(id uint) (*models.Word, error) {
 	var word *models.Word
 	result := r.db.Where("Id = ?", id).First(&word)
 	if result.Error != nil {

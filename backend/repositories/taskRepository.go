@@ -3,7 +3,6 @@ package repositories
 import (
 	"errors"
 	"rusEGE/database/models"
-	"rusEGE/database/utils"
 	"rusEGE/exceptions"
 	"rusEGE/web/schemas"
 
@@ -49,7 +48,7 @@ func (r *GormTaskRepository) Create(task *models.Task) (*models.Task, error) {
 	result := r.db.Create(task)
 	if result.Error != nil {
 		switch {
-		case utils.IsUniqueConstraintError(result.Error):
+		case errors.Is(result.Error, gorm.ErrDuplicatedKey):
 			return nil, exceptions.ErrTaskAlreadyExists
 		default:
 			return nil, result.Error

@@ -14,12 +14,18 @@ func Init() {
 	e.Renderer = t
 
 	userRequiredGroup := e.Group("/")
-	userRequiredGroup.Use(middleware.AuthMiddleware())
+	userRequiredGroup.Use(middleware.UserRequiredMiddleware())
 
 	userRequiredGroup.POST("api/word-error/create", handlers.CreateWordErrorHandler)
 	userRequiredGroup.DELETE("api/word-error/delete", handlers.DeleteUserErrorHandler)
 	userRequiredGroup.GET("api/task/:number/stat", handlers.GetTaskStatHandler)
 	userRequiredGroup.GET("api/rules/get-stat/:task", handlers.GetRulesStatHandler)
+	userRequiredGroup.GET("api/user/get", handlers.GetUserHandler)
+
+	userOptionalGroup := e.Group("/")
+	userOptionalGroup.Use(middleware.OptionalUserMiddleware())
+	userOptionalGroup.GET("api/words/get", handlers.GetWordsHandler)
+
 
 	e.Static("/static", "../public/static")
 
@@ -35,11 +41,9 @@ func Init() {
 	e.POST("api/words/bulk-create", handlers.BulkCreateWordHandler)
 	e.POST("api/words/edit", handlers.EditWordHandler)
 	e.DELETE("api/words/delete", handlers.DeleteWordHandler)
-	e.GET("api/words/get", handlers.GetWordsHandler)
 	e.POST("api/indexseo/create", handlers.CreateIndexSeoHandler)
 	e.POST("api/indexseo/edit", handlers.EditIndexSeoHandler)
 	e.GET("api/indexseo", handlers.GetIndexSeoHandler)
-	e.GET("user/get", handlers.GetUserHandler)
 	e.POST("api/login", handlers.LoginHandler)
 	e.POST("api/register", handlers.CreateUserHandler)
 	e.POST("api/refresh-token/:token", handlers.RefreshTokenHandler)

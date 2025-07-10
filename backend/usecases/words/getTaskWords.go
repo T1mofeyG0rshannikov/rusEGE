@@ -1,4 +1,4 @@
-package usecases
+package words
 
 import (
 	"rusEGE/database/mappers"
@@ -6,20 +6,9 @@ import (
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
 	"rusEGE/web/schemas"
-
-	"math/rand"
-	"time"
+	utils "rusEGE/usecases"
 )
 
-func shuffleSlice(slice []*interfaces.Word) {
-	rand.Seed(time.Now().UnixNano())
-
-	n := len(slice)
-	for i := n - 1; i > 0; i-- {
-		j := rand.Intn(i + 1)
-		slice[i], slice[j] = slice[j], slice[i]
-	}
-}
 
 func GetTaskWords(
 	tr *repositories.GormTaskRepository,
@@ -51,7 +40,7 @@ func GetTaskWords(
 		mappedWords = mappers.DbWordsToWords(words)
 	}
 
-	shuffleSlice(mappedWords)
+	utils.ShuffleSlice(mappedWords)
 
 	return mappedWords, nil
 }

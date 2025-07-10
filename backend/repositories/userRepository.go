@@ -21,7 +21,12 @@ func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
 	return &GormUserRepository{db}
 }
 
-func (r *GormUserRepository) Create(user *models.User) (*models.User, error) {
+func (r *GormUserRepository) Create(username, hashedpassword string) (*models.User, error) {
+	user := &models.User{
+		Username:     username,
+		HashPassword: hashedpassword,
+	}
+
 	result := r.db.Create(user)
 	if result.Error != nil {
 		return nil, result.Error

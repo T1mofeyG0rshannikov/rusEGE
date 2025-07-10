@@ -1,4 +1,4 @@
-package usecases
+package tasks
 
 import (
 	"rusEGE/database/models"

@@ -1,4 +1,4 @@
-package usecases
+package words
 
 import (
 	"errors"
@@ -52,7 +52,7 @@ func BulkCreateWord(
 				Exception: exception,
 			})
 
-			if err != nil {
+			if err != nil && !errors.Is(err, exceptions.ErrWordAlreadyExists) {
 				return err
 			}
 		}

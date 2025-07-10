@@ -4,14 +4,16 @@
         <span class="close" onclick="closeModal(this)">&times;</span>
         <h2>Регистрация</h2>
         <form onsubmit="submitRegister(event, this)">
-            <label for="name">Username:</label><br>
-            <input type="text" id="name" name="name"><br><br>
+            <label for="username">Username:</label><br>
+            <input type="text" name="username"><br><br>
 
             <label for="password">Пароль:</label><br>
-            <input type="password" id="password" name="password"><br><br>
+            <input type="password" name="password"><br><br>
 
-            <label for="password">Повтор пароля:</label><br>
-            <input type="password" id="repeat-password" name="repeat-password"><br><br>
+            <label for="repeat-password">Повтор пароля:</label><br>
+            <input type="password" name="repeat-password"><br><br>
+
+            <span class="error"></span><br>
 
             <a onclick="openLoginForm(event)">Войти в аккаунт</a><br>
             <input style="margin: 0; width: 100%;" class="button" type="submit" value="Отправить">

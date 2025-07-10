@@ -63,9 +63,16 @@ func GetIndexSeoHandler(c echo.Context) error {
 	seo, err := sr.GetIndexSeo()
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": err.Error(),
-		})
+		switch {
+		case errors.Is(err, exceptions.ErrIndexSeoNotFound):
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": err.Error(),
+			})
+		default:
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": err.Error(),
+			})
+		}
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
