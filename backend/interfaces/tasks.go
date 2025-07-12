@@ -23,8 +23,8 @@ type Rule struct {
 }
 
 type Task struct {
-	Number      uint        `json:"number" gorm:"unique"`
-	Description string      `json:"description"`
+	Number      uint       `json:"number" gorm:"unique"`
+	Description string     `json:"description"`
 	Rules       []TaskRule `json:"rules"`
 }
 
@@ -77,4 +77,14 @@ var LETTEROPTIONS = map[rune][]Option{
 		Option{Letter: "С", Correct: false},
 		Option{Letter: "З", Correct: true},
 	},
+}
+
+type StatWord struct {
+	Word   string `json:"word"`
+	ErrorCount uint   `json:"error_count"`
+}
+
+type StatTask struct {
+	Task  uint       `json:"task"`
+	Words []StatWord `json:"words"`
 }

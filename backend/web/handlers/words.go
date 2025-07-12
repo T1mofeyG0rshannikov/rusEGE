@@ -325,3 +325,19 @@ func GetTaskUserWordsHandler(c echo.Context) error {
 		"words": words,
 	})
 }
+
+func GetWordErrorsHandler(c echo.Context) error {
+	tr := repositories.NewGormTaskRepository(nil)
+	wr := repositories.NewGormWordRepository(nil)
+
+	stat, err := usecases.GetWordErrors(tr, wr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"stat": stat,
+	})
+}

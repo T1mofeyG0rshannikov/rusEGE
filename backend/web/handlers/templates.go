@@ -7,25 +7,25 @@ import (
 )
 
 func IndexPageHandler(c echo.Context) error {
-	data := map[string]interface{}{
+	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 		"contentTemplate": "index",
-	}
-
-	return c.Render(http.StatusOK, "index.html", data)
+	})
 }
 
 func TaskPageHandler(c echo.Context) error {
-	data := map[string]interface{}{
+	return c.Render(http.StatusOK, "task.html", map[string]interface{}{
 		"contentTemplate": "task",
-	}
-
-	return c.Render(http.StatusOK, "task.html", data)
+	})
 }
 
 func TasksPageHandler(c echo.Context) error {
-	data := map[string]interface{}{
+	return c.Render(http.StatusOK, "tasks.html", map[string]interface{}{
 		"contentTemplate": "tasks",
-	}
+	})
+}
 
-	return c.Render(http.StatusOK, "tasks.html", data)
+func StatisticsPageHandler(c echo.Context) error {
+	return c.Render(http.StatusOK, "statistics.html", map[string]interface{}{
+		"contentTemplate": "statistics",
+	})
 }

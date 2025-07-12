@@ -182,3 +182,9 @@ async function loginAPI(data){
     
     return await getData(response)
 }
+
+async function getWordErrorsAPI(){
+    const response = await fetch("/api/word-errors/get")
+
+    return await getData(response)
+}

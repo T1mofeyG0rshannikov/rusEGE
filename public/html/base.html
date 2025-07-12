@@ -18,6 +18,8 @@
     {{ template "task" . }}
 {{ else if eq .contentTemplate "tasks" }}
     {{ template "tasks" . }}
+{{ else if eq .contentTemplate "statistics" }}
+    {{ template "statistics" . }}
 {{ end }}
 
 

@@ -5,6 +5,7 @@ import (
 	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
+	"rusEGE/interfaces"
 
 	"gorm.io/gorm"
 )
@@ -162,10 +163,10 @@ func (r *GormWordRepository) GetByWord(wordContent string) (*models.Word, error)
 
 func (r *GormWordRepository) Create(wordContent string, taskId uint, ruleId uint, exception *bool, description *string) (*models.Word, error) {
 	word := &models.Word{
-		Word:   wordContent,
-		TaskId: taskId,
-		RuleId: ruleId,
-		Exception: *exception,
+		Word:        wordContent,
+		TaskId:      taskId,
+		RuleId:      ruleId,
+		Exception:   *exception,
 		Description: description,
 	}
 
@@ -178,4 +179,23 @@ func (r *GormWordRepository) Create(wordContent string, taskId uint, ruleId uint
 	}
 
 	return word, nil
+}
+
+func (r *GormWordRepository) GetTaskWordsWithError(taskId uint) ([]interfaces.StatWord, error) {
+	var results []interfaces.StatWord
+
+	err := r.db.Model(&models.Word{}).
+		Select("words.id as word_id, words.word, COUNT(errors.id) as error_count").
+		Where("words.task_id = ?", taskId).
+		Joins("left join errors on words.id = errors.word_id").
+		Group("words.id, words.word").
+		Order("error_count DESC").
+		Limit(5).
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

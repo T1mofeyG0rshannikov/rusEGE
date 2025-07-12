@@ -1,6 +1,7 @@
 package words
 
 import (
+	"fmt"
 	"rusEGE/database/models"
 	"rusEGE/repositories"
 	"rusEGE/web/schemas"
@@ -18,6 +19,7 @@ func CreateError(
 	}
 
 	userError, err := uwr.CreateError(user.Id, userWord.Id)
+	fmt.Println(userError)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,6 +31,7 @@ func CreateError(
 	}
 
 	wordError, err := wr.CreateError(word.Id)
+	fmt.Println(wordError)
 	if err != nil {
 		return nil, nil, err
 	}
