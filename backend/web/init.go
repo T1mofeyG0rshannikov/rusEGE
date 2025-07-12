@@ -53,5 +53,5 @@ func Init() {
 	e.POST("api/register", handlers.CreateUserHandler)
 	e.POST("api/refresh-token/:token", handlers.RefreshTokenHandler)
 
-	e.Start(":8080")
+	e.Start(":80")
 }
