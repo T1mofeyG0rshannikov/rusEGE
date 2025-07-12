@@ -1,6 +1,5 @@
 package auth
 
-
 import (
 	"rusEGE/auth"
 	"rusEGE/exceptions"
@@ -23,7 +22,7 @@ func LoginUser(
 
 	if hasher.CheckPassword(data.Password, user.HashPassword) {
 		accessToken, err := jwtProcessor.GenerateToken(user.Username, 30)
-		
+
 		if err != nil {
 			return nil, nil, err
 		}

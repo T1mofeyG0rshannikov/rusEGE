@@ -224,3 +224,59 @@
     display: flex;
     justify-content: end;
 }
+
+.basket{
+    width: 15px;
+    cursor: pointer;
+}
+
+.plus{
+    width: 20px;
+    cursor: pointer;
+}
+
+#userwordsmodal li div{
+    display: flex;
+    justify-content: space-between;
+}
+
+#userwordsmodal li {
+    margin: 5px 0px;
+    padding-right: 20px;
+}
+
+#userwordsmodal ul {
+    overflow-y: scroll;
+    max-height: 450px;
+}
+.add-userword{
+    padding: 0 20px;
+}
+
+.add-userword input[type=text], .add-userword select{
+    width: calc(100% - 20px);
+    padding: 8px;
+    border: 1px solid rgb(200, 200, 200);
+}
+
+.nav p{
+    font-size: 20px;
+    color: rgb(200, 200, 200);
+    font-weight: bold;
+}
+
+.nav{
+    display: flex;
+    justify-content: end;
+}
+
+.nav img{
+    width: 20px;
+}
+
+.nav div{
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+}

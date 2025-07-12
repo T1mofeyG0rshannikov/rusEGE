@@ -3,7 +3,6 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"rusEGE/database"
 	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
@@ -23,8 +22,7 @@ func CreateTaskHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
 
 	task, err := tr.Create(&models.Task{
 		Number:      payload.Number,
@@ -71,8 +69,7 @@ func EditTaskHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
 
 	err = tr.Edit(numberUint, payload)
 
@@ -93,10 +90,10 @@ func EditTaskHandler(c echo.Context) error {
 }
 
 func GetTasksHandler(c echo.Context) error {
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
+	rr := repositories.NewGormRuleRepository(nil)
 
-	tasks, err := usecases.GetTasks(tr)
+	tasks, err := usecases.GetTasks(tr, rr)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -121,16 +118,15 @@ func GetTaskStatHandler(c echo.Context) error {
 
 	taskNumber := uint(number)
 
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
-	wr := repositories.NewGormWordRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
+	uwr := repositories.NewGormUserWordRepository(nil)
 
 	user := utils.UserFromContext(c)
 
 	stat, err := usecases.GetTaskStat(
 		taskNumber,
 		tr,
-		wr,
+		uwr,
 		user,
 	)
 

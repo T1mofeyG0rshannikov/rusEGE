@@ -36,7 +36,7 @@ func BulkCreateWord(
 				return err
 			}
 
-			_, err = wr.Create(task.Id, wordString, rule.Id, &exception, &description)
+			_, err = wr.Create(wordString, task.Id, rule.Id, &exception, &description)
 
 			if err != nil && !errors.Is(err, exceptions.ErrWordAlreadyExists) {
 				return err

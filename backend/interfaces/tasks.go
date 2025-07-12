@@ -25,7 +25,7 @@ type Rule struct {
 type Task struct {
 	Number      uint        `json:"number" gorm:"unique"`
 	Description string      `json:"description"`
-	Rules       *[]TaskRule `json:"rules"`
+	Rules       []TaskRule `json:"rules"`
 }
 
 type Option struct {

@@ -28,7 +28,7 @@ func NewGormTaskRepository(db *gorm.DB) *GormTaskRepository {
 	return &GormTaskRepository{db}
 }
 
-func (r *GormTaskRepository) GetAll() ([]*models.Task, error) {
+func (r *GormTaskRepository) All() ([]*models.Task, error) {
 	var tasks []*models.Task
 	result := r.db.Find(&tasks)
 	if result.Error != nil {
@@ -36,16 +36,6 @@ func (r *GormTaskRepository) GetAll() ([]*models.Task, error) {
 	}
 
 	return tasks, nil
-}
-
-func (r *GormTaskRepository) GetTaskRules(id uint) ([]*models.Rule, error) {
-	var rules []*models.Rule
-	result := r.db.Where("Id IN (?)", r.db.Model(&models.Word{}).Select("RuleId").Where("task_id = ?", id)).Find(&rules)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return rules, nil
 }
 
 func (r *GormTaskRepository) Create(task *models.Task) (*models.Task, error) {

@@ -17,7 +17,7 @@ func GetRulesStat(
 		return nil, err
 	}
 
-	rules, err := tr.GetTaskRules(task.Id)
+	rules, err := rr.GetTaskRules(task.Id)
 	taskRules := make([]interfaces.Rule, len(rules))
 
 	if err != nil {

@@ -8,15 +8,16 @@ import (
 
 func CreateError(
 	wr *repositories.GormWordRepository,
+	uwr *repositories.GormUserWordRepository,
 	data schemas.CreateWordErrorRequest,
 	user *models.User,
 ) (*models.UserError, *models.Error, error) {
-	userWord, err := wr.GetUserWord(data.Word)
+	userWord, err := uwr.Get(data.Word)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	userError, err := wr.CreateUserError(user.Id, userWord.Id)
+	userError, err := uwr.CreateError(user.Id, userWord.Id)
 	if err != nil {
 		return nil, nil, err
 	}

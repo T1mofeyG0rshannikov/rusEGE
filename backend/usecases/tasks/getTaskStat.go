@@ -9,7 +9,7 @@ import (
 func GetTaskStat(
 	taskNumber uint,
 	tr *repositories.GormTaskRepository,
-	wr *repositories.GormWordRepository,
+	uwr *repositories.GormUserWordRepository,
 	user *models.User,
 ) (*[]map[string]interface{}, error) {
 	task, err := tr.Get(taskNumber)
@@ -18,7 +18,7 @@ func GetTaskStat(
 		return nil, err
 	}
 
-	words, err := wr.GetTaskUserWords(task.Id, user.Id, nil)
+	words, err := uwr.GetTaskWords(task.Id, user.Id, nil)
 
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func GetTaskStat(
 	var stat []map[string]interface{}
 
 	for _, word := range words {
-		errors, err := wr.GetUserWordErrors(word.Id)
+		errors, err := uwr.GetErrors(word.Id)
 		if err != nil {
 			return nil, err
 		}

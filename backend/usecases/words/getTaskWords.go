@@ -13,6 +13,7 @@ import (
 func GetTaskWords(
 	tr *repositories.GormTaskRepository,
 	wr *repositories.GormWordRepository,
+	uwr *repositories.GormUserWordRepository,
 	data schemas.GetWordsRequest,
 	user *models.User,
 ) ([]*interfaces.Word, error) {
@@ -25,7 +26,7 @@ func GetTaskWords(
 	}
 
 	if user != nil {
-		words, err := wr.GetTaskUserWords(task.Id, user.Id, data.RuleIds)
+		words, err := uwr.GetTaskWords(task.Id, user.Id, data.RuleIds)
 		if err != nil {
 			return nil, err
 		}

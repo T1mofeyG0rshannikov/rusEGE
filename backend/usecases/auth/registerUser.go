@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"rusEGE/auth"
-	"rusEGE/database/models"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
 	"rusEGE/security"
@@ -13,6 +12,7 @@ import (
 func CreateUser(
 	ur *repositories.GormUserRepository,
 	wr *repositories.GormWordRepository,
+	uwr *repositories.GormUserWordRepository,
 	jwtProcessor *auth.JWTProcessor,
 	hasher *security.ScryptHasher,
 	data schemas.CreateUserRequest,
@@ -45,19 +45,14 @@ func CreateUser(
 	}
 
 	for _, word := range words {
-		userWord, err := wr.CreateUserWord(&models.UserWord{
-			UserId: user.Id,
-			Word:   word.Word,
-			TaskId: word.TaskId,
-			RuleId: word.RuleId,
-		})
+		userWord, err := uwr.Create(user.Id, word.Word, word.TaskId, word.RuleId, &word.Exception, word.Description)
 
 		if err != nil {
 			return nil, nil, err
 		}
 
 		for _, option := range word.Options {
-			_, err := wr.CreateUserOption(userWord.Id, option.Letter)
+			_, err := uwr.CreateOption(userWord.Id, option.Letter)
 			if err != nil {
 				return nil, nil, err
 			}

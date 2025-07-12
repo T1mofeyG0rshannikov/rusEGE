@@ -7,8 +7,7 @@ function openRegisterForm(event){
     document.getElementById("register").style.display = "block"
 }
 
-function openLoginForm(event){
-    event.preventDefault()
+function openLoginForm(){
     document.querySelectorAll('.modal').forEach(m => {
         m.style.display = "none"
     })
@@ -54,4 +53,35 @@ function setAuthToken(access_token, refresh_token){
 
 function closeModal(modal){
     modal.closest(".modal").style.display = "none"
+}
+
+function setAuthToNav(user){
+    const profile = document.querySelector(".profile")
+    if (user){
+        profile.classList.add("auth")
+        profile.querySelector(".logo").innerHTML = `<a>${user.username[0].toUpperCase()}</a>`
+        
+        const userNav = document.querySelector(".user-nav")
+        userNav.querySelector(".title a").textContent = user.username
+    } else{
+        profile.classList.remove("auth")
+        profile.querySelector(".logo").innerHTML = `<img src="/static/images/profile.png" />`
+    }
+}
+
+function checkIsAuth(){
+    authRetry(isAuthAPI)().then(response => {
+        if (response.status === 200){
+            console.log(response)
+            const user = response.data.user
+            setAuthToNav(user)
+        }
+    })
+}
+
+function logout(){
+    localStorage.removeItem("rusEGE_access_token")
+    localStorage.removeItem("rusEGE_refresh_token")
+
+    setAuthToNav(null)
 }

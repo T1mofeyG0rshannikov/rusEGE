@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"rusEGE/database"
 	"rusEGE/repositories"
 	"rusEGE/web/schemas"
 	"rusEGE/web/utils"
@@ -13,7 +12,6 @@ import (
 	"strconv"
 )
 
-
 func EditRuleHadler(c echo.Context) error {
 	var payload schemas.EditRuleRequest
 
@@ -21,9 +19,7 @@ func EditRuleHadler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-
-	rr := repositories.NewGormRuleRepository(db)
+	rr := repositories.NewGormRuleRepository(nil)
 
 	rule, err := usecases.EditRule(rr, payload)
 
@@ -51,9 +47,8 @@ func GetRulesStatHandler(c echo.Context) error {
 	taskNumber := uint(number)
 	user := utils.UserFromContext(c)
 
-	db := database.GetDB()
-	tr := repositories.NewGormTaskRepository(db)
-	rr := repositories.NewGormRuleRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
+	rr := repositories.NewGormRuleRepository(nil)
 
 	stat, err := usecases.GetRulesStat(tr, rr, taskNumber, user)
 
@@ -65,5 +60,33 @@ func GetRulesStatHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"stat": stat,
+	})
+}
+
+func GetTaskRulesHandler(c echo.Context) error {
+	numberStr := c.Param("taskNumber")
+	number, err := strconv.ParseUint(numberStr, 10, 64)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	taskNumber := uint(number)
+
+	tr := repositories.NewGormTaskRepository(nil)
+	rr := repositories.NewGormRuleRepository(nil)
+
+	rules, err := usecases.GetTaskRules(tr, rr, taskNumber)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"rules": rules,
 	})
 }

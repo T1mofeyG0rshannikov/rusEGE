@@ -112,3 +112,73 @@ async function getTasksAPI(){
 
     return await getData(response)
 }
+
+async function getTaskUserWordsAPI(task){
+    const response = await fetch(`/api/user-words/get/${task}`, {
+        method: "GET",
+        headers: {
+            'Authorization': localStorage.getItem("rusEGE_access_token")
+        }
+    })
+
+    return await getData(response)
+}
+
+async function getTaskRulesAPI(task){
+    const response = await fetch(`/api/rule/get/${task}`)
+    return await getData(response)
+}
+
+async function deleteUserWordAPI(wordId){
+    const response = await fetch(`/api/user-words/delete/${wordId}`, {
+        method: "DELETE",
+        headers: {
+            'Authorization': localStorage.getItem("rusEGE_access_token")
+        }
+    })
+
+    return await getData(response)
+}
+
+async function createUserWordAPI(task, rule, word, exception, letters){
+    const response = await fetch(`/api/user-words/create`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem("rusEGE_access_token")
+        },
+        body: JSON.stringify({
+            task: task,
+            rule: rule,
+            word: word,
+            exception: exception,
+            letters: letters
+        })
+    })
+
+    return await getData(response)
+}
+
+async function isAuthAPI(){
+   const response = await fetch(`/api/user/get`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem("rusEGE_access_token")
+        }
+    })
+
+    return await getData(response)
+}
+
+async function loginAPI(data){
+    const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: data
+    })
+    
+    return await getData(response)
+}

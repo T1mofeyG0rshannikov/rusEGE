@@ -11,7 +11,6 @@ import (
 func CreateIndexSeo(
 	sr *repositories.GormSeoRepository,
 	data schemas.CreateIndexSeoRequest,
-	user *models.User,
 ) (*models.IndexSeo, error) {
 	existingSeo, err := sr.GetIndexSeo()
 	if err != nil && !errors.Is(err, exceptions.ErrIndexSeoNotFound){

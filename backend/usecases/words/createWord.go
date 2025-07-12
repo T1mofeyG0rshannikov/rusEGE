@@ -23,7 +23,7 @@ func CreateWord(
 		return nil, err
 	}
 
-	word, err := wr.Create(task.Id, data.Word, rule.Id, &data.Exception, data.Description)
+	word, err := wr.Create(data.Word, task.Id, rule.Id, &data.Exception, data.Description)
 
 	if err != nil {
 		return nil, err

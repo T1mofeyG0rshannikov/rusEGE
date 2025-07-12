@@ -16,8 +16,91 @@ function updateProgressBar() {
     document.querySelector('.progressbar__value').style.width = percent + '%';
 }
 
+function getTaskUserWords(task){
+    authRetry(getTaskUserWordsAPI)(task).then(response => {
+        console.log(response)
+        if (response.status === 200){
+            let wordsHTML = ``;
+            response.data.words.forEach(w => {
+                wordsHTML += `<li><div>${w.word} <img class="basket" onclick="deleteUserWord(this, ${w.id})" src="/static/images/cart.png" /></div></li>`
+            });
+
+            
+            const modal = document.getElementById("userwordsmodal")
+            modal.querySelector("ul").innerHTML = wordsHTML
+            modal.querySelector(".modal-content").innerHTML += `<img src="/static/images/plus.webp" class="plus" onclick="prepareAddUserWord(${task})" />`
+            modal.querySelector(".task-num").textContent = task
+        }
+        else if (response.status === 401){
+            openLoginForm()
+        }
+    })
+}
+
+function prepareAddUserWord(task){
+    const modal = document.getElementById("userwordsmodal")
+    const addSpace = document.createElement("div")
+
+    authRetry(getTaskRulesAPI)(task).then(response => {
+        console.log(response)
+        const rules = response.data.rules;
+
+        let rulesHTML = ``;
+
+        rules.forEach(r => {
+            rulesHTML += `<option value="${r.id}">${r.rule}</option>`
+        })
+    
+        addSpace.innerHTML = `
+            <select>${rulesHTML}</select>
+            <span class="hint">Выберите правило</span><br>
+
+            <input type="text" placeholder="Введите слово" /><br>
+
+            <div><input type="checkbox" /> Исключение</div>
+
+            <span class="hint">Введите слово, указав спорную букву заглавным символом. Если на месте пропуска нет буквы, укажите символ "-" </span>
+            
+            <input type="text" placeholder="Варианты" /><br>
+            <span class="hint">Введите буквы, которые могут быть на месте пропуска через запятую. Если на месте пропуска нет буквы, укажите символ "-" </span>
+    
+            <button style="margin-left: 0;" onclick="addUserWord(${task})" class="button">Добавить</button>
+        `;
+        addSpace.classList.add("add-userword")
+        modal.querySelector(".modal-content").appendChild(addSpace)
+    
+        modal.querySelector(".plus").remove()
+    })
+}
+
+function addUserWord(task){
+    const modal = document.getElementById("userwordsmodal")
+    const word = modal.querySelector("input").value
+
+    const letters = modal.querySelectorAll("input")[2].value
+    const rule = modal.querySelector("select").value
+    const exception = modal.querySelector("input[type=checkbox]").checked
+
+    authRetry(createUserWordAPI)(task, +rule, word, exception, letters).then(response => {
+        console.log(response)
+        if (response.status === 200){
+            const w = response.data.word
+            modal.querySelector("ul").innerHTML += `<li><div>${w.word} <img class="basket" onclick="deleteUserWord(this, ${w.id})" src="/static/images/cart.png" /></div></li>`
+            modal.querySelector(".add-userword").remove()
+            modal.querySelector(".modal-content").innerHTML += `<img src="/static/images/plus.webp" class="plus" onclick="prepareAddUserWord(${task})" />`
+        }
+    })
+}
+
+function openUserwordsModal() {
+    document.getElementById("userwordsmodal").style.display = "block"
+    const task = window.location.pathname.split('/')[2]
+    getTaskUserWords(task)
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     getSeo()
+    checkIsAuth()
 
     let words = []
     const wordErrors = new Set()
@@ -136,3 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
         nextWord()
     })
 })
+
+function deleteUserWord(img, wordId){
+    authRetry(deleteUserWordAPI)(wordId).then(response => {
+        if (response.status === 200){
+            img.closest("li").remove()
+        }
+    })
+}

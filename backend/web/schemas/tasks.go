@@ -47,6 +47,15 @@ type DeleteUserErrorRequest struct {
 	Word uint `json:"word_id"`
 }
 
+type CreateUserWordRequest struct {
+	Word        string  `json:"word"`
+	Letters     string  `json:"letters"`
+	Task        uint    `json:"task"`
+	Rule        uint    `json:"rule"`
+	Exception   *bool   `json:"exception"`
+	Description *string `json:"description"`
+}
+
 type EditRuleRequest struct {
 	Id      uint      `json:"id"`
 	NewRule *string   `json:"rule"`

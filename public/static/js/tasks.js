@@ -84,6 +84,7 @@ function getTasks(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    checkIsAuth()
     getTasks()
     getSeo()
 })

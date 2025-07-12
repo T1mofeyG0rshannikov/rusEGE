@@ -1,55 +1,29 @@
 package tasks
 
 import (
+	"rusEGE/database/mappers"
 	"rusEGE/interfaces"
 	"rusEGE/repositories"
 )
 
 func GetTasks(
 	tr *repositories.GormTaskRepository,
-) ([]*interfaces.Task, error) {
-	dbTasks, err := tr.GetAll()
+	rr *repositories.GormRuleRepository,
+) ([]interfaces.Task, error) {
+	dbTasks, err := tr.All()
 	if err != nil {
 		return nil, err
 	}
 
-	tasks := make([]*interfaces.Task, len(dbTasks))
+	tasks := make([]interfaces.Task, len(dbTasks))
 	for i, dbTask := range dbTasks {
-
-		rules, err := tr.GetTaskRules(dbTask.Id)
-		taskRules := make([]interfaces.TaskRule, len(rules))
-
+		rules, err := rr.GetTaskRules(dbTask.Id)
+		
 		if err != nil {
 			return nil, err
 		}
 
-		if len(rules) > 0 {
-			for i, dbRule := range rules {
-				taskRules[i] = interfaces.TaskRule{
-					Id:   dbRule.Id,
-					Rule: dbRule.Rule,
-				}
-			}
-
-			tasks[i] = &interfaces.Task{
-				Number:      dbTask.Number,
-				Description: dbTask.Description,
-				Rules:       &taskRules,
-			}
-		} else {
-			for i, dbRule := range rules {
-				taskRules[i] = interfaces.TaskRule{
-					Id:   dbRule.Id,
-					Rule: dbRule.Rule,
-				}
-			}
-
-			tasks[i] = &interfaces.Task{
-				Number:      dbTask.Number,
-				Description: dbTask.Description,
-				Rules:       &taskRules,
-			}
-		}
+		tasks[i] = mappers.DbTaskToTask(*dbTask, rules)		
 	}
 
 	return tasks, nil

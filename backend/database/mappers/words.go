@@ -10,7 +10,7 @@ import (
 func replaceUpperCaseWithSpaces(s string) string {
 	var result strings.Builder
 	for _, r := range s {
-		if !(r >= 'а' && r <= 'я') && (r != ' ' && r != ' ' && r != '(' && r != ')' && r != 'ё') {
+		if !(r >= 'а' && r <= 'я') && r != ' ' && r != ' ' && r != '(' && r != ')' && r != 'ё' {
 			result.WriteRune('_')
 		} else {
 			result.WriteRune(r)

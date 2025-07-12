@@ -3,7 +3,6 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"rusEGE/database"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
 	usecases "rusEGE/usecases/words"
@@ -110,14 +109,13 @@ func GetWordsHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-
 	user := utils.UserFromContext(c)
 
-	tr := repositories.NewGormTaskRepository(db)
-	wr := repositories.NewGormWordRepository(db)
+	tr := repositories.NewGormTaskRepository(nil)
+	wr := repositories.NewGormWordRepository(nil)
+	uwr := repositories.NewGormUserWordRepository(nil)
 
-	words, err := usecases.GetTaskWords(tr, wr, payload, user)
+	words, err := usecases.GetTaskWords(tr, wr, uwr, payload, user)
 
 	if err != nil {
 		switch {
@@ -146,9 +144,51 @@ func DeleteWordHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-	wr := repositories.NewGormWordRepository(db)
+	wr := repositories.NewGormWordRepository(nil)
 	err := wr.Delete(payload.Word)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	return c.String(http.StatusOK, "")
+}
+
+func DeleteUserWordHandler(c echo.Context) error {
+	wordId, err := utils.ParseIntFromRequest(c, "wordId")
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	user := utils.UserFromContext(c)
+	uwr := repositories.NewGormUserWordRepository(nil)
+
+	userWord, err := uwr.GetById(*wordId)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, exceptions.ErrRecordNotFound):
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": err.Error(),
+			})
+		default:
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "something went wrong",
+			})
+		}
+	}
+
+	if user.Id != userWord.UserId {
+		return c.JSON(http.StatusForbidden, map[string]interface{}{
+			"message": "You don't have the rights to execute",
+		})
+	}
+
+	err = uwr.Delete(userWord)
+
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
@@ -165,12 +205,11 @@ func CreateWordErrorHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-
 	user := utils.UserFromContext(c)
-	wr := repositories.NewGormWordRepository(db)
+	wr := repositories.NewGormWordRepository(nil)
+	uwr := repositories.NewGormUserWordRepository(nil)
 
-	userError, wordError, err := usecases.CreateError(wr, payload, user)
+	userError, wordError, err := usecases.CreateError(wr, uwr, payload, user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -190,6 +229,38 @@ func CreateWordErrorHandler(c echo.Context) error {
 	})
 }
 
+func CreateUserWordHandler(c echo.Context) error {
+	var payload schemas.CreateUserWordRequest
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	user := utils.UserFromContext(c)
+
+	uwr := repositories.NewGormUserWordRepository(nil)
+	tr := repositories.NewGormTaskRepository(nil)
+
+	word, err := usecases.CreateUserWord(uwr, tr, payload, user)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, exceptions.ErrTaskNotFound):
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": err.Error(),
+			})
+		default:
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": err.Error(),
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"word": word,
+	})
+}
+
 func DeleteUserErrorHandler(c echo.Context) error {
 	var payload schemas.DeleteUserErrorRequest
 
@@ -197,10 +268,9 @@ func DeleteUserErrorHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-	wr := repositories.NewGormWordRepository(db)
+	wr := repositories.NewGormUserWordRepository(nil)
 
-	err := wr.DeleteUserError(payload.Word)
+	err := wr.DeleteError(payload.Word)
 
 	if err != nil {
 		switch {
@@ -216,4 +286,42 @@ func DeleteUserErrorHandler(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, "")
+}
+
+func GetTaskUserWordsHandler(c echo.Context) error {
+	taskNumber, err := utils.ParseIntFromRequest(c, "taskNumber")
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	user := utils.UserFromContext(c)
+
+	uwr := repositories.NewGormUserWordRepository(nil)
+	tr := repositories.NewGormTaskRepository(nil)
+
+	words, err := usecases.GetTaskUserWords(
+		uwr,
+		tr,
+		*taskNumber,
+		user,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, exceptions.ErrTaskNotFound):
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": err.Error(),
+			})
+		default:
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": err.Error(),
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"words": words,
+	})
 }

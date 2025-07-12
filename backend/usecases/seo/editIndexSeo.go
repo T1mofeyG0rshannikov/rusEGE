@@ -9,7 +9,6 @@ import (
 func EditIndexSeo(
 	sr *repositories.GormSeoRepository,
 	data schemas.EditIndexSeoRequest,
-	user *models.User,
 ) (*models.IndexSeo, error) {
 	seo, err := sr.GetIndexSeo()
 	if err != nil {

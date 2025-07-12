@@ -3,13 +3,10 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"rusEGE/auth"
-	"rusEGE/database"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
 	"rusEGE/usecases/seo"
 	"rusEGE/web/schemas"
-	"rusEGE/web/utils"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,20 +18,11 @@ func CreateIndexSeoHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-
-	user, err := utils.GetUserFromHeader(
-		auth.NewJWTProcessor(),
-		repositories.NewGormUserRepository(db),
-		c,
-	)
-
-	sr := repositories.NewGormSeoRepository(db)
+	sr := repositories.NewGormSeoRepository(nil)
 
 	seo, err := seo.CreateIndexSeo(
 		sr,
 		payload,
-		user,
 	)
 
 	if err != nil {
@@ -56,9 +44,7 @@ func CreateIndexSeoHandler(c echo.Context) error {
 }
 
 func GetIndexSeoHandler(c echo.Context) error {
-	db := database.GetDB()
-
-	sr := repositories.NewGormSeoRepository(db)
+	sr := repositories.NewGormSeoRepository(nil)
 
 	seo, err := sr.GetIndexSeo()
 
@@ -87,20 +73,11 @@ func EditIndexSeoHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	db := database.GetDB()
-
-	user, err := utils.GetUserFromHeader(
-		auth.NewJWTProcessor(),
-		repositories.NewGormUserRepository(db),
-		c,
-	)
-
-	sr := repositories.NewGormSeoRepository(db)
+	sr := repositories.NewGormSeoRepository(nil)
 
 	seo, err := seo.EditIndexSeo(
 		sr,
 		payload,
-		user,
 	)
 
 	if err != nil {

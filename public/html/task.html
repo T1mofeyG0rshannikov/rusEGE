@@ -11,11 +11,33 @@
         <div class="navbar-right">
             <img src="/static/images/question.png" />
             <img src="/static/images/gear.png" />
-            <img src="/static/images/profile.png" />
+            <div class="profile">
+                <div class="logo">
+                    <img src="/static/images/profile.png" />
+                </div>
+
+                <div class="user-nav">
+                    <div class="title">
+                        <a></a>
+                    </div>
+
+                    <hr />
+
+                    <div class="bottom">
+                        <a onclick="logout()" ><img src="/static/images/menu_logout.png" />Выйти</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="content">
+        <div class="nav">
+            <div onclick="openUserwordsModal()">
+                <p>РЕДАКТИРОВАТЬ СПИСОК СЛОВ</p>
+                <img  src="/static/images/pencil.png"/>
+            </div>
+        </div>
         <main class="center-content">
             <div class="word-wrapper">
                 <div class="progressbar">
@@ -41,6 +63,8 @@
             </div>
         </div>
     </div>
+
+    {{ template "userWordsModal" . }}
 
     <script src="/static/js/seo.js" ></script>
     <script src="/static/js/task.js" ></script>

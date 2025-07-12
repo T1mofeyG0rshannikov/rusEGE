@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"rusEGE/auth"
-	"rusEGE/database"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
 	"rusEGE/security"
@@ -22,11 +21,10 @@ func CreateUserHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	db := database.GetDB()
-
 	accessToken, refreshToken, err := usecases.CreateUser(
-		repositories.NewGormUserRepository(db),
-		repositories.NewGormWordRepository(db),
+		repositories.NewGormUserRepository(nil),
+		repositories.NewGormWordRepository(nil),
+		repositories.NewGormUserWordRepository(nil),
 		auth.NewJWTProcessor(),
 		security.NewScryptHasher(),
 		payload,
@@ -52,8 +50,6 @@ func CreateUserHandler(c echo.Context) error {
 }
 
 func LoginHandler(c echo.Context) error {
-	db := database.GetDB()
-
 	var payload schemas.LoginRequest
 
 	if err := c.Bind(&payload); err != nil {
@@ -61,7 +57,7 @@ func LoginHandler(c echo.Context) error {
 	}
 
 	accessToken, refreshToken, err := usecases.LoginUser(
-		repositories.NewGormUserRepository(db),
+		repositories.NewGormUserRepository(nil),
 		security.NewScryptHasher(),
 		auth.NewJWTProcessor(),
 		&payload,
@@ -95,8 +91,7 @@ func GetUserHandler(c echo.Context) error {
 	user := utils.UserFromContext(c)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"username": user.Username,
-		"user_id":  user.Id,
+		"user": user,
 	})
 }
 
@@ -113,12 +108,11 @@ func RefreshTokenHandler(c echo.Context) error {
 		})
 	}
 
-	db := database.GetDB()
-	ur := repositories.NewGormUserRepository(db)
+	ur := repositories.NewGormUserRepository(nil)
 
 	user, err := ur.Get(claims.Username)
 
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
 		})

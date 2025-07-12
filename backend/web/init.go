@@ -1,7 +1,6 @@
 package web
 
 import (
-	"rusEGE/database"
 	"rusEGE/web/handlers"
 	"rusEGE/web/middleware"
 
@@ -9,7 +8,6 @@ import (
 )
 
 func Init() {
-	database.GetDB()
 	e := echo.New()
 
 	t := NewTemplateRenderer()
@@ -23,6 +21,9 @@ func Init() {
 	userRequiredGroup.GET("api/task/:number/stat", handlers.GetTaskStatHandler)
 	userRequiredGroup.GET("api/rules/get-stat/:task", handlers.GetRulesStatHandler)
 	userRequiredGroup.GET("api/user/get", handlers.GetUserHandler)
+	userRequiredGroup.GET("api/user-words/get/:taskNumber", handlers.GetTaskUserWordsHandler)
+	userRequiredGroup.DELETE("api/user-words/delete/:wordId", handlers.DeleteUserWordHandler)
+	userRequiredGroup.POST("api/user-words/create", handlers.CreateUserWordHandler)
 
 	userOptionalGroup := e.Group("/")
 	userOptionalGroup.Use(middleware.OptionalUserMiddleware())
@@ -34,6 +35,7 @@ func Init() {
 	e.GET("/tasks", handlers.TasksPageHandler)
 	e.GET("/task/:number", handlers.TaskPageHandler)
 
+	e.GET("api/rule/get/:taskNumber", handlers.GetTaskRulesHandler)
 	e.POST("api/rule/edit", handlers.EditRuleHadler)
 	e.GET("api/tasks/get", handlers.GetTasksHandler)
 	e.POST("api/tasks/create", handlers.CreateTaskHandler)
