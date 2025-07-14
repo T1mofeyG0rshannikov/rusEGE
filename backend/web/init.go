@@ -1,9 +1,12 @@
 package web
 
 import (
+	"log"
+	"os"
 	"rusEGE/web/handlers"
 	"rusEGE/web/middleware"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
 
@@ -53,5 +56,12 @@ func Init() {
 	e.POST("api/register", handlers.CreateUserHandler)
 	e.POST("api/refresh-token/:token", handlers.RefreshTokenHandler)
 
-	e.Start(":8080")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Ошибка при загрузке файла .env: %v", err)
+	}
+
+	port := os.Getenv("PORT")
+
+	e.Start(":" + port)
 }
