@@ -15,17 +15,20 @@ func EditIndexSeo(
 		return nil, err
 	}
 
-	if data.About != nil{
+	if data.About != nil {
 		seo.About = *data.About
 	}
-	if data.Title != nil{
+	if data.Title != nil {
 		seo.Title = *data.Title
 	}
-	if data.Logo != nil{
+	if data.Logo != nil {
 		seo.Logo = *data.Logo
 	}
-	if data.Image != nil{
+	if data.Image != nil {
 		seo.Image = *data.Image
+	}
+	if data.FipiLink != nil {
+		seo.FipiLink = *data.FipiLink
 	}
 
 	seo, err = sr.EditIndexSeo(seo)

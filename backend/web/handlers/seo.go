@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"rusEGE/exceptions"
 	"rusEGE/repositories"
-	"rusEGE/usecases/seo"
+	usecases "rusEGE/usecases/seo"
 	"rusEGE/web/schemas"
 
 	"github.com/labstack/echo/v4"
@@ -20,7 +20,7 @@ func CreateIndexSeoHandler(c echo.Context) error {
 
 	sr := repositories.NewGormSeoRepository(nil)
 
-	seo, err := seo.CreateIndexSeo(
+	seo, err := usecases.CreateIndexSeo(
 		sr,
 		payload,
 	)
@@ -75,7 +75,7 @@ func EditIndexSeoHandler(c echo.Context) error {
 
 	sr := repositories.NewGormSeoRepository(nil)
 
-	seo, err := seo.EditIndexSeo(
+	seo, err := usecases.EditIndexSeo(
 		sr,
 		payload,
 	)
@@ -93,7 +93,7 @@ func EditIndexSeoHandler(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"seo": seo,
 	})
 }

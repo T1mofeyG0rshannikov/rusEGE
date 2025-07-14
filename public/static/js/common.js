@@ -58,12 +58,14 @@ function closeModal(modal){
 function setAuthToNav(user){
     const profile = document.querySelector(".profile")
     if (user){
+        profile.querySelector(".logo").removeEventListener('click', openLoginForm)
         profile.classList.add("auth")
         profile.querySelector(".logo").innerHTML = `<a>${user.username[0].toUpperCase()}</a>`
         
         const userNav = document.querySelector(".user-nav")
         userNav.querySelector(".title a").textContent = user.username
     } else{
+        profile.querySelector(".logo").addEventListener('click', openLoginForm)
         profile.classList.remove("auth")
         profile.querySelector(".logo").innerHTML = `<img src="/static/images/profile.png" />`
     }
@@ -75,6 +77,9 @@ function checkIsAuth(){
             console.log(response)
             const user = response.data.user
             setAuthToNav(user)
+        }
+        else{
+            setAuthToNav(null)
         }
     })
 }

@@ -3,6 +3,7 @@ function getSeo(){
         if (response.status == 200){
             response.json().then(response => {
                 const seo = response.seo;
+                console.log(seo)
                 try{
                     document.querySelector("#image").src = seo.image
                 }
@@ -23,6 +24,12 @@ function getSeo(){
                 
                 try{
                     document.querySelector("#logo").src = seo.logo
+                } catch{
+                    
+                }
+
+                try{
+                    document.querySelector("#fipi-link").href = seo.fipi_link
                 } catch{
                     
                 }

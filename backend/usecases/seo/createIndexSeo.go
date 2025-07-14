@@ -13,7 +13,7 @@ func CreateIndexSeo(
 	data schemas.CreateIndexSeoRequest,
 ) (*models.IndexSeo, error) {
 	existingSeo, err := sr.GetIndexSeo()
-	if err != nil && !errors.Is(err, exceptions.ErrIndexSeoNotFound){
+	if err != nil && !errors.Is(err, exceptions.ErrIndexSeoNotFound) {
 		return nil, err
 	}
 
@@ -22,10 +22,11 @@ func CreateIndexSeo(
 	}
 
 	seo, err := sr.CreateIndexSeo(&models.IndexSeo{
-		Title: data.Title,
-		Image: data.Image,
-		About: data.About,
-		Logo:  data.Logo,
+		Title:    data.Title,
+		Image:    data.Image,
+		About:    data.About,
+		Logo:     data.Logo,
+		FipiLink: data.FipiLink,
 	})
 
 	if err != nil {
