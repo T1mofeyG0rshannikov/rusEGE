@@ -97,3 +97,17 @@ func EditIndexSeoHandler(c echo.Context) error {
 		"seo": seo,
 	})
 }
+
+func SitemapHandler(c echo.Context) error {
+	tr := repositories.NewGormTaskRepository(nil)
+
+	output, err := usecases.GenerateSitemap(tr)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationXML)
+	return c.String(http.StatusOK, string(output))
+}

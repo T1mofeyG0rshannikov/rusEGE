@@ -38,7 +38,7 @@ func Init() {
 	e.GET("/tasks", handlers.TasksPageHandler)
 	e.GET("/task/:number", handlers.TaskPageHandler)
 	e.GET("/statistics", handlers.StatisticsPageHandler)
-
+	e.GET("/sitemap.xml", handlers.SitemapHandler)
 	e.GET("api/word-errors/get", handlers.GetWordErrorsHandler)
 	e.GET("api/rule/get/:taskNumber", handlers.GetTaskRulesHandler)
 	e.POST("api/rule/edit", handlers.EditRuleHadler)
